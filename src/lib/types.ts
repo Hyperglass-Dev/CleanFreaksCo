@@ -26,6 +26,7 @@ export interface Client {
   email: string;
   phone: string;
   avatar: string;
+  address: string;
   upcomingJobs: number;
   totalSpent: number;
 }

@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Upload } from 'lucide-react';
 import type { Client } from '@/lib/types';
+import { Textarea } from './ui/textarea';
 
 type ClientDialogProps = {
   open: boolean;
@@ -33,12 +34,12 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
       setFormData(client);
       setLogoPreview(client.avatar);
     } else {
-      setFormData({ name: '', email: '', phone: '', avatar: 'https://placehold.co/150x150.png' });
+      setFormData({ name: '', email: '', phone: '', address: '', avatar: 'https://placehold.co/150x150.png' });
       setLogoPreview('https://placehold.co/150x150.png');
     }
   }, [client, open]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({ ...prev, [id]: value }));
   };
@@ -97,6 +98,10 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
             <div className="grid gap-2">
                 <Label htmlFor="phone">Phone Number</Label>
                 <Input id="phone" value={formData.phone || ''} onChange={handleInputChange} />
+            </div>
+            <div className="grid gap-2">
+                <Label htmlFor="address">Address</Label>
+                <Textarea id="address" value={formData.address || ''} onChange={handleInputChange} />
             </div>
         </div>
         <DialogFooter>

@@ -85,7 +85,10 @@ export default function ClientsPage() {
                         <AvatarImage src={client.avatar} alt={client.name} />
                         <AvatarFallback>{client.name.charAt(0)}</AvatarFallback>
                       </Avatar>
-                      <div className="font-medium">{client.name}</div>
+                      <div>
+                        <div className="font-medium">{client.name}</div>
+                        <div className="text-sm text-muted-foreground">{client.address}</div>
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell className="hidden md:table-cell">

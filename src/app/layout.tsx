@@ -10,12 +10,18 @@ export const metadata: Metadata = {
   title: 'CleanSweepHQ',
   description: 'Professional cleaning business management app',
   manifest: '/manifest.json',
-  themeColor: '#E6E6FA',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0',
   icons: {
     icon: '/icon-192x192.png',
     apple: '/icon-192x192.png',
   },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: '#E6E6FA',
 };
 
 export default function RootLayout({

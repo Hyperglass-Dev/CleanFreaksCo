@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Upload } from 'lucide-react';
-import type { Staff } from '@/lib/types';
+import type { Cleaner } from '@/lib/types';
 import { Textarea } from './ui/textarea';
 import { Badge } from './ui/badge';
 import { X } from 'lucide-react';
@@ -23,12 +23,12 @@ import { X } from 'lucide-react';
 type StaffDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  staff: Staff | null;
-  onSave: (staff: Staff) => void;
+  staff: Cleaner | null;
+  onSave: (staff: Cleaner) => void;
 };
 
 export function StaffDialog({ open, onOpenChange, staff, onSave }: StaffDialogProps) {
-  const [formData, setFormData] = useState<Partial<Staff>>({});
+  const [formData, setFormData] = useState<Partial<Cleaner>>({});
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [skillInput, setSkillInput] = useState('');
 
@@ -37,8 +37,8 @@ export function StaffDialog({ open, onOpenChange, staff, onSave }: StaffDialogPr
       setFormData(staff);
       setAvatarPreview(staff.avatar);
     } else {
-      setFormData({ name: '', skills: [], location: '', availability: '', avatar: 'https://placehold.co/150x150.png' });
-      setAvatarPreview('https://placehold.co/150x150.png');
+      setFormData({ name: '', skills: [], location: '', availability: '', avatar: 'https://ui-avatars.io/api/?name=User&background=E6E6FA&color=800000&size=150' });
+      setAvatarPreview('https://ui-avatars.io/api/?name=User&background=E6E6FA&color=800000&size=150');
     }
   }, [staff, open]);
 
@@ -72,7 +72,7 @@ export function StaffDialog({ open, onOpenChange, staff, onSave }: StaffDialogPr
   }
 
   const handleSave = () => {
-    onSave(formData as Staff);
+    onSave(formData as Cleaner);
     onOpenChange(false);
   };
 

@@ -1,10 +1,12 @@
 import { PageHeader } from '@/components/page-header';
 import { KpiCard } from '@/components/kpi-card';
-import { kpis } from '@/lib/data';
+import { calculateKpis } from '@/lib/data';
 import { RevenueChart } from '@/components/revenue-chart';
 import { BookingsChart } from '@/components/bookings-chart';
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const kpis = await calculateKpis();
+
   return (
     <>
       <PageHeader title="Dashboard" />

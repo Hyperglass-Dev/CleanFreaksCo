@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/page-header';
 import {
   Table,
@@ -14,7 +14,7 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { clients as initialClients } from '@/lib/data';
+import { getClients, addClient, updateClient } from '@/lib/data';
 import { MoreHorizontal, PlusCircle } from 'lucide-react';
 import {
   DropdownMenu,
@@ -27,10 +27,27 @@ import type { Client } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
 export default function ClientsPage() {
-  const [clients, setClients] = useState<Client[]>(initialClients);
+  const [clients, setClients] = useState<Client[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const loadClients = async () => {
+      try {
+        const clientsData = await getClients();
+        setClients(clientsData);
+      } catch (error) {
+        console.error('Error loading clients:', error);
+        toast({ title: "Error", description: "Failed to load clients.", variant: "destructive" });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadClients();
+  }, [toast]);
 
   const handleAddClient = () => {
     setSelectedClient(null);
@@ -42,16 +59,24 @@ export default function ClientsPage() {
     setIsDialogOpen(true);
   };
 
-  const handleSaveClient = (client: Client) => {
-    if (client.id) {
-      // Edit existing client
-      setClients(clients.map(c => c.id === client.id ? client : c));
-      toast({ title: "Client Updated", description: `${client.name}'s details have been updated.`});
-    } else {
-      // Add new client
-      const newClient = { ...client, id: `client-${clients.length + 1}`, upcomingJobs: 0, totalSpent: 0 };
-      setClients([...clients, newClient]);
-       toast({ title: "Client Added", description: `${client.name} has been added to your client list.`});
+  const handleSaveClient = async (client: Client) => {
+    try {
+      if (client.id) {
+        // Edit existing client
+        await updateClient(client.id, client);
+        setClients(clients.map(c => c.id === client.id ? client : c));
+        toast({ title: "Client Updated", description: `${client.name}'s details have been updated.`});
+      } else {
+        // Add new client
+        const newClientData = { ...client, upcomingJobs: 0, totalSpent: 0 };
+        const newClientId = await addClient(newClientData);
+        const newClient = { ...newClientData, id: newClientId };
+        setClients([...clients, newClient]);
+        toast({ title: "Client Added", description: `${client.name} has been added to your client list.`});
+      }
+    } catch (error) {
+      console.error('Error saving client:', error);
+      toast({ title: "Error", description: "Failed to save client.", variant: "destructive" });
     }
   };
 
@@ -77,7 +102,20 @@ export default function ClientsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {clients.map(client => (
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-6">
+                    Loading clients...
+                  </TableCell>
+                </TableRow>
+              ) : clients.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-6">
+                    No clients found. Add your first client to get started.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                clients.map(client => (
                 <TableRow key={client.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
@@ -114,7 +152,8 @@ export default function ClientsPage() {
                     </DropdownMenu>
                   </TableCell>
                 </TableRow>
-              ))}
+                ))
+              )}
             </TableBody>
           </Table>
         </CardContent>

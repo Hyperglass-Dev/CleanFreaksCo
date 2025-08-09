@@ -55,10 +55,10 @@ export function AppSidebar() {
       <SidebarFooter>
          <div className="flex items-center gap-3 p-3 transition-colors rounded-md hover:bg-sidebar-accent">
             <Avatar className="w-9 h-9">
-              <AvatarImage src="https://i.pravatar.cc/150?u=admin" alt="Dijana" />
-              <AvatarFallback>
-                D
-              </AvatarFallback>
+            <AvatarImage src="https://ui-avatars.io/api/?name=Dijana&background=E6E6FA&color=800000" alt="Dijana" />
+            <AvatarFallback>
+            D
+            </AvatarFallback>
             </Avatar>
             <div className="flex flex-col overflow-hidden text-sm">
                 <span className="font-semibold truncate">Dijana</span>

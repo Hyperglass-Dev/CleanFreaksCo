@@ -1,6 +1,7 @@
 // src/lib/firebase.ts
 import { initializeApp, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   projectId: "cleansweephq-dmwr4",
@@ -11,13 +12,10 @@ const firebaseConfig = {
   messagingSenderId: "711544861338",
 };
 
-
 // Initialize Firebase
-let app;
-if (!getApps().length) {
-  app = initializeApp(firebaseConfig);
-}
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 
 const auth = getAuth(app);
+const db = getFirestore(app);
 
-export { app, auth };
+export { app, auth, db };

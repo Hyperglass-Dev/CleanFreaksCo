@@ -1,24 +1,57 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { companySettings as initialSettings } from '@/lib/data';
+import { getCompanySettings, updateCompanySettings } from '@/lib/data';
+import type { CompanySettings } from '@/lib/types';
 import Image from 'next/image';
 import { Upload, AlertTriangle } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
 
 export default function SettingsPage() {
-  const [settings, setSettings] = useState(initialSettings);
-  const [isAbnSet, setIsAbnSet] = useState(!!initialSettings.abn);
-  const [logoPreview, setLogoPreview] = useState<string | null>(initialSettings.logo);
+  const [settings, setSettings] = useState<CompanySettings>({
+    name: '',
+    abn: '',
+    address: '',
+    phone: '',
+    email: '',
+    website: '',
+    logo: '',
+    bankDetails: '',
+  });
+  const [isAbnSet, setIsAbnSet] = useState(false);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isGstRegistered, setIsGstRegistered] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const settingsData = await getCompanySettings();
+        if (settingsData) {
+          setSettings(settingsData);
+          setIsAbnSet(!!settingsData.abn);
+          setLogoPreview(settingsData.logo || null);
+        }
+      } catch (error) {
+        console.error('Error loading settings:', error);
+        toast({ title: "Error", description: "Failed to load settings.", variant: "destructive" });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSettings();
+  }, [toast]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
@@ -37,13 +70,17 @@ export default function SettingsPage() {
     }
   };
 
-  const handleSave = () => {
-    // In a real app, you'd save this to a database.
-    console.log('Saving settings:', {...settings, isGstRegistered});
-    if (settings.abn) {
-      setIsAbnSet(true);
+  const handleSave = async () => {
+    try {
+      await updateCompanySettings({...settings});
+      if (settings.abn) {
+        setIsAbnSet(true);
+      }
+      toast({ title: "Settings Saved", description: "Company settings updated successfully." });
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      toast({ title: "Error", description: "Failed to save settings.", variant: "destructive" });
     }
-    alert('Settings saved successfully!');
   };
 
   return (
@@ -62,7 +99,7 @@ export default function SettingsPage() {
               <div className="md:col-span-1 flex flex-col items-center text-center">
                 <div className="relative w-32 h-32 mb-4">
                   <Image
-                      src={logoPreview || "https://placehold.co/150x150.png"}
+                      src={logoPreview || "https://ui-avatars.io/api/?name=Company&background=E6E6FA&color=800000&size=150"}
                       alt="Company Logo"
                       width={128}
                       height={128}
@@ -165,7 +202,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
-                    <Label htmlFor="on-the-way" className="font-medium">'On the Way' Alert</Label>
+                    <Label htmlFor="on-the-way" className="font-medium">&apos;On the Way&apos; Alert</Label>
                     <p className="text-sm text-muted-foreground">Triggered when cleaner starts their route.</p>
                   </div>
                   <Switch id="on-the-way" />
@@ -186,7 +223,7 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
                     <Label htmlFor="daily-schedule" className="font-medium">Daily Run Sheet</Label>
-                    <p className="text-sm text-muted-foreground">Send the day's schedule every morning at 7 AM.</p>
+                    <p className="text-sm text-muted-foreground">Send the day&apos;s schedule every morning at 7 AM.</p>
                   </div>
                   <Switch id="daily-schedule" defaultChecked />
                 </div>

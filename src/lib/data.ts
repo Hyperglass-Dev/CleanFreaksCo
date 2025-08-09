@@ -1,0 +1,246 @@
+
+import type { Cleaner, Job, Client, Kpi, NavLink, Invoice, Bill, Quote, CompanySettings } from '@/lib/types';
+import {
+  LayoutDashboard,
+  Calendar,
+  ClipboardList,
+  Users,
+  Settings,
+  Receipt,
+  FileWarning,
+  DollarSign,
+  BookOpen,
+  Bot,
+  User,
+  Users2,
+} from 'lucide-react';
+
+export const navLinks: NavLink[] = [
+  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/scheduling', label: 'Scheduling', icon: Calendar },
+  { href: '/bookkeeping', label: 'Bookkeeping', icon: Receipt },
+  { href: '/run-sheet', label: 'Run Sheet', icon: ClipboardList },
+  { href: '/clients', label: 'Clients', icon: Users },
+  { href: '/staff', label: 'Staff', icon: Users2 },
+  { href: '/assistant', label: 'Assistant', icon: Bot },
+  { href: '/settings', label: 'Settings', icon: Settings },
+];
+
+export const cleaners: Cleaner[] = [
+  {
+    id: 'cleaner-1',
+    name: 'Ana Silva',
+    skills: ['Deep Cleaning', 'Window Washing', 'Carpet Cleaning'],
+    location: 'Sydney CBD',
+    availability: 'Mon-Fri 9am-5pm',
+    avatar: 'https://i.pravatar.cc/150?u=cleaner-1',
+  },
+  {
+    id: 'cleaner-2',
+    name: 'Ben Carter',
+    skills: ['Standard Cleaning', 'Eco-Friendly Cleaning'],
+    location: 'North Shore',
+    availability: 'Mon, Wed, Fri 10am-6pm',
+    avatar: 'https://i.pravatar.cc/150?u=cleaner-2',
+  },
+  {
+    id: 'cleaner-3',
+    name: 'Carlos Diaz',
+    skills: ['Deep Cleaning', 'Upholstery Cleaning', 'Post-Construction'],
+    location: 'Eastern Suburbs',
+    availability: 'Tue-Sat 8am-4pm',
+    avatar: 'https://i.pravatar.cc/150?u=cleaner-3',
+  },
+  {
+    id: 'cleaner-4',
+    name: 'Diana Evans',
+    skills: ['Standard Cleaning', 'Window Washing'],
+    location: 'Western Suburbs',
+    availability: 'Mon-Thu 9am-3pm',
+    avatar: 'https://i.pravatar.cc/150?u=cleaner-4',
+  },
+];
+
+export const jobs: Job[] = [
+  {
+    id: 'job-1',
+    clientName: 'Sydney CBD Offices',
+    address: '123 Pitt St, Sydney NSW 2000',
+    time: '9:00 AM',
+    date: '2024-07-29',
+    description: 'Standard office cleaning. Focus on conference rooms.',
+    status: 'Scheduled',
+    cleanerIds: ['cleaner-1'],
+  },
+  {
+    id: 'job-2',
+    clientName: 'Parramatta Apartments',
+    address: '456 Church St, Parramatta NSW 2150',
+    time: '11:00 AM',
+    date: '2024-07-29',
+    description: 'Move-out deep clean for apartment 3B.',
+    status: 'In Progress',
+    cleanerIds: ['cleaner-2'],
+  },
+  {
+    id: 'job-3',
+    clientName: 'Bondi Retail',
+    address: '789 Campbell Pde, Bondi Beach NSW 2026',
+    time: '2:00 PM',
+    date: '2024-07-29',
+    description: 'Weekly retail space cleaning. High-traffic areas.',
+    status: 'Completed',
+    cleanerIds: ['cleaner-3']
+  },
+  {
+    id: 'job-4',
+    clientName: 'Chatswood Home',
+    address: '101 Victoria Ave, Chatswood NSW 2067',
+    time: '10:00 AM',
+    date: '2024-07-30',
+    description: 'Residential deep clean. 3 bed, 2 bath.',
+    status: 'Scheduled',
+    cleanerIds: ['cleaner-4'],
+  },
+  {
+    id: 'job-5',
+    clientName: 'Newtown Bistro',
+    address: '212 King St, Newtown NSW 2042',
+    time: 'N/A',
+    date: 'N/A',
+    description: 'Emergency cleanup after event. Requires two cleaners.',
+    status: 'Unscheduled',
+    cleanerIds: ['cleaner-1', 'cleaner-3'],
+  },
+  {
+    id: 'job-6',
+    clientName: 'Macquarie Park Tech',
+    address: '333 Talavera Rd, Macquarie Park NSW 2113',
+    time: 'N/A',
+    date: 'N/A',
+    description: 'Post-construction cleaning for new office wing.',
+    status: 'Unscheduled',
+  },
+];
+
+export const clients: Client[] = [
+  {
+    id: 'client-1',
+    name: 'Sydney CBD Offices',
+    email: 'contact@sydneyoffices.com.au',
+    phone: '02 9123 4567',
+    avatar: 'https://i.pravatar.cc/150?u=client-1',
+    address: '123 Pitt St, Sydney NSW 2000',
+    upcomingJobs: 1,
+    totalSpent: 4500,
+  },
+  {
+    id: 'client-2',
+    name: 'Parramatta Apartments',
+    email: 'manager@parra-apartments.com.au',
+    phone: '02 9876 5432',
+    avatar: 'https://i.pravatar.cc/150?u=client-2',
+    address: '456 Church St, Parramatta NSW 2150',
+    upcomingJobs: 3,
+    totalSpent: 12000,
+  },
+  {
+    id: 'client-3',
+    name: 'Bondi Retail',
+    email: 'store@bondiretail.com.au',
+    phone: '02 9300 1234',
+    avatar: 'https://i.pravatar.cc/150?u=client-3',
+    address: '789 Campbell Pde, Bondi Beach NSW 2026',
+    upcomingJobs: 4,
+    totalSpent: 8500,
+  },
+  {
+    id: 'client-4',
+    name: 'Chatswood Home',
+    email: 'hello@chatswoodhome.com.au',
+    phone: '02 9411 5678',
+    avatar: 'https://i.pravatar.cc/150?u=client-4',
+    address: '101 Victoria Ave, Chatswood NSW 2067',
+    upcomingJobs: 1,
+    totalSpent: 1200,
+  },
+];
+
+export const kpis: Kpi[] = [
+  {
+    title: 'Revenue',
+    value: '$12,450',
+    change: '+11.2%',
+    changeType: 'increase',
+    icon: DollarSign,
+  },
+  {
+    title: 'Bookings',
+    value: '82',
+    change: '+5.1%',
+    changeType: 'increase',
+    icon: BookOpen,
+  },
+  {
+    title: 'Pending Invoices',
+    value: '$2,350',
+    change: '3 overdue',
+    changeType: 'increase',
+    icon: Receipt,
+  },
+  {
+    title: 'Bills to Pay',
+    value: '$850',
+    change: '2 upcoming',
+    changeType: 'increase',
+    icon: FileWarning,
+  },
+];
+
+export const revenueData = [
+  { month: 'Jan', revenue: 8200 },
+  { month: 'Feb', revenue: 9600 },
+  { month: 'Mar', revenue: 11200 },
+  { month: 'Apr', revenue: 10500 },
+  { month: 'May', revenue: 13100 },
+  { month: 'Jun', revenue: 12450 },
+];
+
+export const bookingsData = [
+    { service: 'Standard', bookings: 45, fill: 'hsl(var(--chart-1))' },
+    { service: 'Deep Clean', bookings: 25, fill: 'hsl(var(--chart-2))' },
+    { service: 'Windows', bookings: 12, fill: 'hsl(var(--chart-3))' },
+    { service: 'Carpet', bookings: 8, fill: 'hsl(var(--chart-4))' },
+    { service: 'Other', bookings: 5, fill: 'hsl(var(--chart-5))' },
+];
+
+export const invoices: Invoice[] = [
+    { id: 'inv-1', clientName: 'Sydney CBD Offices', amount: 1200, dueDate: '2024-08-15', status: 'Pending' },
+    { id: 'inv-2', clientName: 'Parramatta Apartments', amount: 750, dueDate: '2024-07-20', status: 'Paid' },
+    { id: 'inv-3', clientName: 'Bondi Retail', amount: 400, dueDate: '2024-07-10', status: 'Overdue' },
+    { id: 'inv-4', clientName: 'Chatswood Home', amount: 1150, dueDate: '2024-08-01', status: 'Pending' },
+];
+
+export const bills: Bill[] = [
+    { id: 'bill-1', supplierName: 'Cleaning Supplies Co.', amount: 350, dueDate: '2024-08-10', status: 'Unpaid' },
+    { id: 'bill-2', supplierName: 'Vehicle Maintenance Inc.', amount: 500, dueDate: '2024-08-20', status: 'Unpaid' },
+    { id: 'bill-3', supplierName: 'Uniform Providers', amount: 250, dueDate: '2024-07-25', status: 'Paid' },
+];
+
+export const quotes: Quote[] = [
+    { id: 'quote-1', clientName: 'Newtown Bistro', amount: 800, expiryDate: '2024-08-15', status: 'Sent' },
+    { id: 'quote-2', clientName: 'Macquarie Park Tech', amount: 2500, expiryDate: '2024-08-20', status: 'Draft' },
+    { id: 'quote-3', clientName: 'Surry Hills Industries', amount: 1800, expiryDate: '2024-07-25', status: 'Accepted' },
+];
+
+// Mock company settings data
+export const companySettings: CompanySettings = {
+    name: 'Clean Freaks Co',
+    abn: '12 345 678 901',
+    address: '123 Cleaning Ave, Sydney NSW 2000',
+    phone: '02 9876 5432',
+    email: 'contact@cleanfreaks.co',
+    website: 'https://cleanfreaks.co',
+    logo: 'https://placehold.co/150x150.png',
+    bankDetails: 'Bank: Example Bank\nAccount Name: Clean Freaks Co\nBSB: 123-456\nAccount: 12345678',
+};

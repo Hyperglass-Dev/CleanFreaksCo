@@ -1,0 +1,111 @@
+
+import { PageHeader } from '@/components/page-header';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { bills } from '@/lib/data';
+import { PlusCircle, Trash2, Download, Printer } from 'lucide-react';
+
+export default function NewBillPage() {
+  const suppliers = [...new Set(bills.map(bill => bill.supplierName))];
+    
+  return (
+    <>
+       <PageHeader title="Create a New Bill">
+        <div className="flex items-center gap-2">
+            <Button variant="outline"><Printer className="mr-2" /> Print</Button>
+            <Button variant="outline"><Download className="mr-2" /> Download PDF</Button>
+            <Button>Save Bill</Button>
+        </div>
+      </PageHeader>
+      <Card className="max-w-4xl mx-auto shadow-md">
+        <CardHeader>
+          <CardTitle>Bill Details</CardTitle>
+          <CardDescription>
+            Enter the details of a bill received from a supplier.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form className="grid gap-6">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="supplier">Select Supplier</Label>
+                <Select>
+                  <SelectTrigger id="supplier">
+                    <SelectValue placeholder="Choose a supplier" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {suppliers.map((supplier, index) => (
+                        <SelectItem key={index} value={supplier}>{supplier}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+               <div className="space-y-2">
+                <Label htmlFor="bill-date">Bill Date</Label>
+                <Input id="bill-date" type="date" defaultValue={new Date().toISOString().substring(0, 10)} />
+              </div>
+            </div>
+             <div className="space-y-2">
+              <Label>Line Items</Label>
+              <div className="p-4 border rounded-lg space-y-4 bg-muted/50">
+                 <div className="grid grid-cols-12 gap-2 items-center">
+                    <div className="col-span-5"><Input placeholder="Service or Item Description" /></div>
+                    <div className="col-span-2"><Input type="number" placeholder="Qty" defaultValue="1" /></div>
+                    <div className="col-span-2"><Input type="number" placeholder="Price" /></div>
+                    <div className="col-span-2 text-right font-medium">$0.00</div>
+                     <div className="col-span-1 flex justify-end">
+                        <Button variant="ghost" size="icon"><Trash2 className="w-4 h-4 text-destructive"/></Button>
+                    </div>
+                 </div>
+                 <Button variant="outline" size="sm" className="bg-background">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Add Line Item
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="notes">Notes or Reference</Label>
+              <Textarea id="notes" placeholder="e.g., Reference number, project details" />
+            </div>
+             <div className="flex justify-end">
+                <div className="w-full max-w-sm space-y-2">
+                    <div className="flex justify-between">
+                        <span className="text-muted-foreground">Subtotal</span>
+                        <span>$0.00</span>
+                    </div>
+                     <div className="flex justify-between">
+                        <span className="text-muted-foreground">GST (10%)</span>
+                        <span>$0.00</span>
+                    </div>
+                     <div className="flex justify-between font-bold text-lg border-t pt-2 mt-2">
+                        <span>Total</span>
+                        <span>$0.00</span>
+                    </div>
+                </div>
+            </div>
+          </form>
+        </CardContent>
+         <CardFooter className="justify-end gap-2">
+          <Button variant="ghost">Cancel</Button>
+        </CardFooter>
+      </Card>
+    </>
+  );
+}

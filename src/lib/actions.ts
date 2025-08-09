@@ -116,7 +116,9 @@ Please respond as Astra, Dijana's proactive business assistant for Clean Freaks 
         console.log('Retrieving run status...');
         console.log('Thread ID:', thread.id, 'Run ID:', run.id);
         
-        // Use updated OpenAI SDK format - temporarily ignore types for GPT-5 compatibility
+        // Debug: Let me try using the standard format but log types  
+        console.log('Types - thread.id:', typeof thread.id, 'run.id:', typeof run.id);
+        
         // @ts-ignore - OpenAI SDK type compatibility with new GPT-5 updates
         let runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
         

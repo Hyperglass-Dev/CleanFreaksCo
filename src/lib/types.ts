@@ -10,6 +10,15 @@ export interface Cleaner {
   avatar: string;
 }
 
+export interface Staff {
+  id?: string;
+  name: string;
+  skills: string[];
+  location: string;
+  availability: string;
+  avatar: string;
+}
+
 export interface Job {
   id: string;
   clientName: string;

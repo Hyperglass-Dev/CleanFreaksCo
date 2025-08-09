@@ -24,15 +24,43 @@ import {
 } from '@/components/ui/dropdown-menu';
 import type { Cleaner } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
+import { StaffDialog } from '@/components/staff-dialog';
+import { useToast } from '@/hooks/use-toast';
 
 
 export default function StaffPage() {
   const [staff, setStaff] = useState<Cleaner[]>(initialCleaners);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedStaff, setSelectedStaff] = useState<Cleaner | null>(null);
+  const { toast } = useToast();
+
+  const handleAddStaff = () => {
+    setSelectedStaff(null);
+    setIsDialogOpen(true);
+  };
+
+  const handleEditStaff = (staffMember: Cleaner) => {
+    setSelectedStaff(staffMember);
+    setIsDialogOpen(true);
+  };
+
+  const handleSaveStaff = (staffMember: Cleaner) => {
+    if (staffMember.id) {
+      // Edit existing staff
+      setStaff(staff.map(s => s.id === staffMember.id ? staffMember : s));
+      toast({ title: "Staff Updated", description: `${staffMember.name}'s details have been updated.`});
+    } else {
+      // Add new staff
+      const newStaff = { ...staffMember, id: `cleaner-${staff.length + 1}` };
+      setStaff([...staff, newStaff]);
+      toast({ title: "Staff Added", description: `${staffMember.name} has been added to your team.`});
+    }
+  };
   
   return (
     <>
       <PageHeader title="Staff Members">
-        <Button>
+        <Button onClick={handleAddStaff}>
           <PlusCircle className="mr-2" />
           Add Staff
         </Button>
@@ -77,7 +105,7 @@ export default function StaffPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleEditStaff(member)}>
                           Edit Staff
                         </DropdownMenuItem>
                          <DropdownMenuItem>
@@ -92,7 +120,12 @@ export default function StaffPage() {
           </Table>
         </CardContent>
       </Card>
+      <StaffDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        staff={selectedStaff}
+        onSave={handleSaveStaff}
+      />
     </>
   );
 }
-

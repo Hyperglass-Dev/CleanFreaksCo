@@ -1,22 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { addJob } from '@/lib/data';
+import { addJob, getClients } from '@/lib/data';
 import { Plus } from 'lucide-react';
+import type { Client } from '@/lib/types';
+import { AddressAutocomplete } from '@/components/address-autocomplete';
 
 interface JobDialogProps {
   children?: React.ReactNode;
+  onJobCreated?: () => void;
 }
 
-export function JobDialog({ children }: JobDialogProps) {
+export function JobDialog({ children, onJobCreated }: JobDialogProps) {
   const [open, setOpen] = useState(false);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [formData, setFormData] = useState({
+    clientId: '',
     clientName: '',
     address: '',
     time: '',
@@ -26,13 +32,51 @@ export function JobDialog({ children }: JobDialogProps) {
   });
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => {
+    if (open) {
+      loadClients();
+    }
+  }, [open]);
+
+  const loadClients = async () => {
+    try {
+      const clientsData = await getClients();
+      setClients(clientsData);
+    } catch (error) {
+      console.error('Failed to load clients:', error);
+    }
+  };
+
+  const handleClientSelect = (clientId: string) => {
+    const client = clients.find(c => c.id === clientId);
+    if (client) {
+      setSelectedClient(client);
+      setFormData(prev => ({
+        ...prev,
+        clientId: client.id,
+        clientName: client.name,
+        address: client.address || ''
+      }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     
     try {
-      await addJob(formData);
+      const jobData = {
+        clientName: formData.clientName,
+        address: formData.address,
+        time: formData.time,
+        date: formData.date,
+        description: formData.description,
+        status: formData.status,
+      };
+      await addJob(jobData);
+      
       setFormData({
+        clientId: '',
         clientName: '',
         address: '',
         time: '',
@@ -40,7 +84,13 @@ export function JobDialog({ children }: JobDialogProps) {
         description: '',
         status: 'Unscheduled',
       });
+      setSelectedClient(null);
       setOpen(false);
+      
+      // Refresh the jobs list
+      if (onJobCreated) {
+        onJobCreated();
+      }
     } catch (error) {
       console.error('Failed to create job:', error);
     } finally {
@@ -64,23 +114,38 @@ export function JobDialog({ children }: JobDialogProps) {
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="clientName">Client Name</Label>
-            <Input
-              id="clientName"
-              value={formData.clientName}
-              onChange={(e) => setFormData(prev => ({ ...prev, clientName: e.target.value }))}
-              required
-            />
+            <Label htmlFor="client">Select Client</Label>
+            <Select value={formData.clientId} onValueChange={handleClientSelect} required>
+              <SelectTrigger>
+                <SelectValue placeholder="Choose a client..." />
+              </SelectTrigger>
+              <SelectContent>
+                {clients.map((client) => (
+                  <SelectItem key={client.id} value={client.id}>
+                    {client.name} - {client.email}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {clients.length === 0 && (
+              <p className="text-sm text-muted-foreground mt-1">
+                No clients found. <a href="/clients" className="text-primary hover:underline">Add clients first</a>
+              </p>
+            )}
           </div>
           
           <div>
             <Label htmlFor="address">Address</Label>
-            <Input
+            <AddressAutocomplete
               id="address"
               value={formData.address}
-              onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+              onChange={(value) => setFormData(prev => ({ ...prev, address: value }))}
+              placeholder="Start typing an address..."
               required
             />
+            <p className="text-xs text-muted-foreground mt-1">
+              Address will be auto-verified using Google Places
+            </p>
           </div>
           
           <div className="grid grid-cols-2 gap-4">

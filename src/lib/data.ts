@@ -5,7 +5,6 @@ import {
   Calendar,
   ClipboardList,
   Users,
-  BellRing,
   Settings,
   Receipt,
   FileWarning,
@@ -19,7 +18,6 @@ export const navLinks: NavLink[] = [
   { href: '/bookkeeping', label: 'Bookkeeping', icon: Receipt },
   { href: '/run-sheet', label: 'Run Sheet', icon: ClipboardList },
   { href: '/clients', label: 'Clients', icon: Users },
-  { href: '/reminders', label: 'Reminders', icon: BellRing },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 

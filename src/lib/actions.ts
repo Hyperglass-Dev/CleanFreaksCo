@@ -85,6 +85,7 @@ export async function getAssistantResponse(message: string) {
         // Create a thread
         console.log('Creating OpenAI thread...');
         const thread = await openai.beta.threads.create();
+        console.log('Thread created:', thread);
         console.log('Thread created with ID:', thread.id);
         
         if (!thread || !thread.id) {
@@ -106,27 +107,19 @@ Please respond as Astra, Dijana's proactive business assistant for Clean Freaks 
         const run = await openai.beta.threads.runs.create(thread.id, {
             assistant_id: ASSISTANT_ID,
         });
+        console.log('Run created:', run);
         console.log('Run created with ID:', run.id);
 
         if (!run || !run.id) {
             throw new Error('Failed to create assistant run - no run ID returned');
         }
 
-        // Wait for completion using proper parameter format
-        console.log('Retrieving run status...');
-        console.log('Thread ID:', thread.id, 'Run ID:', run.id);
-        
-        // Debug: Let me try using the standard format but log types  
-        console.log('Types - thread.id:', typeof thread.id, 'run.id:', typeof run.id);
-        
-        // @ts-ignore - OpenAI SDK type compatibility with new GPT-5 updates
-        let runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+        // Wait for completion - use correct OpenAI SDK syntax
+        let runStatus = await openai.beta.threads.runs.retrieve(run.id, { thread_id: thread.id });
         
         while (runStatus.status === 'in_progress' || runStatus.status === 'queued') {
-            console.log('Run status:', runStatus.status, '- waiting...');
             await new Promise(resolve => setTimeout(resolve, 1000));
-            // @ts-ignore - OpenAI SDK type compatibility with new GPT-5 updates
-            runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+            runStatus = await openai.beta.threads.runs.retrieve(run.id, { thread_id: thread.id });
         }
 
         console.log('Final run status:', runStatus.status);

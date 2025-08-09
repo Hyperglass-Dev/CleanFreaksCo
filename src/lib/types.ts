@@ -20,6 +20,7 @@ export interface Staff {
   availability: string;
   avatar: string;
   phone?: string;
+  archived?: boolean;
 }
 
 export interface Job {
@@ -42,6 +43,7 @@ export interface Client {
   address: string;
   upcomingJobs: number;
   totalSpent: number;
+  archived?: boolean;
 }
 
 export interface Kpi {

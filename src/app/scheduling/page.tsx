@@ -8,6 +8,7 @@ import { Sparkles, Clock, MapPin } from 'lucide-react';
 import { jobs } from '@/lib/data';
 import { SmartAllocationDialog } from '@/components/smart-allocation-dialog';
 import { SchedulingCalendar } from '@/components/scheduling-calendar';
+import { JobDialog } from '@/components/job-dialog';
 
 export default function SchedulingPage() {
   const [selectedJobDescription, setSelectedJobDescription] = useState('');
@@ -22,7 +23,9 @@ export default function SchedulingPage() {
 
   return (
     <>
-      <PageHeader title="Scheduling" />
+      <PageHeader title="Scheduling">
+        <JobDialog />
+      </PageHeader>
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-1">
           <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">

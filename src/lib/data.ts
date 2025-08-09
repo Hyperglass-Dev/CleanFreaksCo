@@ -113,9 +113,13 @@ export const deleteCleaner = async (id: string): Promise<void> => {
 };
 
 // STAFF FUNCTIONS
-export const getStaff = async (): Promise<Staff[]> => {
+export const getStaff = async (includeArchived = false): Promise<Staff[]> => {
   try {
-    const querySnapshot = await getDocs(collection(db, COLLECTIONS.staff));
+    let q = collection(db, COLLECTIONS.staff);
+    if (!includeArchived) {
+      q = query(q, where('archived', '!=', true));
+    }
+    const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
@@ -149,6 +153,18 @@ export const updateStaff = async (id: string, updates: Partial<Staff>): Promise<
     });
   } catch (error) {
     console.error('Error updating staff:', error);
+    throw error;
+  }
+};
+
+export const archiveStaff = async (id: string): Promise<void> => {
+  try {
+    await updateDoc(doc(db, COLLECTIONS.staff, id), {
+      archived: true,
+      updatedAt: Timestamp.now()
+    });
+  } catch (error) {
+    console.error('Error archiving staff:', error);
     throw error;
   }
 };

@@ -6,7 +6,7 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'CleanIQ',
+  title: 'Clean Freaks Co',
   description: 'Manage your cleaning business with intelligence.',
 };
 

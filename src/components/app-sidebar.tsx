@@ -27,7 +27,7 @@ export function AppSidebar() {
           <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground">
             <Sparkles className="w-5 h-5" />
           </div>
-          <span className="text-lg font-semibold font-headline">CleanIQ</span>
+          <span className="text-lg font-semibold font-headline">Clean Freaks Co</span>
         </div>
       </SidebarHeader>
 
@@ -61,7 +61,7 @@ export function AppSidebar() {
             </Avatar>
             <div className="flex flex-col overflow-hidden text-sm">
                 <span className="font-semibold truncate">Admin User</span>
-                <span className="text-muted-foreground truncate">admin@cleaniq.co</span>
+                <span className="text-muted-foreground truncate">admin@cleanfreaks.co</span>
             </div>
          </div>
       </SidebarFooter>

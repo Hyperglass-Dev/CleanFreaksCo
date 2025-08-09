@@ -35,7 +35,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Check if this is an admin email
   const isAdminEmail = (email: string): boolean => {
-    const adminEmails = ['dijana@cleanfreaks.co', 'dev@cleanfreaks.co'];
+    const adminEmails = ['dijanatodorovic88@gmail.com', 'joshua@hyperglass.com.au'];
     return adminEmails.includes(email.toLowerCase());
   };
 

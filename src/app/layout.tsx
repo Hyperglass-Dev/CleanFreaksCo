@@ -6,8 +6,8 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'CleanSweepHQ',
-  description: 'Manage your cleaning business with ease.',
+  title: 'CleanIQ',
+  description: 'Manage your cleaning business with intelligence.',
 };
 
 export default function RootLayout({

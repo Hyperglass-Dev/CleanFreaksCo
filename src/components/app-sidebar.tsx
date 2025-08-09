@@ -61,16 +61,15 @@ export function AppSidebar() {
 
       <SidebarFooter>
          <div className="flex items-center gap-3 p-3 transition-colors rounded-md hover:bg-sidebar-accent">
-            <Avatar className="w-9 h-9">
-            <AvatarImage src="https://ui-avatars.io/api/?name=Dijana&background=E6E6FA&color=800000" alt="Dijana" />
-            <AvatarFallback>
-            D
-            </AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col overflow-hidden text-sm">
-                <span className="font-semibold truncate">Dijana</span>
-                <span className="text-muted-foreground truncate">dijana@cleanfreaks.co</span>
-            </div>
+         <Avatar className="w-9 h-9">
+         <AvatarFallback className="bg-purple-100 text-purple-800 font-semibold">
+         D
+         </AvatarFallback>
+         </Avatar>
+         <div className="flex flex-col overflow-hidden text-sm">
+             <span className="font-semibold truncate">Dijana</span>
+         <span className="text-muted-foreground truncate">dijana@cleanfreaks.co</span>
+         </div>
          </div>
       </SidebarFooter>
     </Sidebar>

@@ -23,7 +23,7 @@ export function AppWrapper({ children }: AppWrapperProps) {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-yellow-50">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-purple-600" />
-          <p className="text-muted-foreground">Loading CleanSweepHQ...</p>
+          <p className="text-muted-foreground">Loading Clean Freaks Co...</p>
         </div>
       </div>
     );

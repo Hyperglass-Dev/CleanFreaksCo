@@ -1,4 +1,4 @@
-import type { Cleaner, Job, Client, Kpi, NavLink, Invoice, Bill, Quote, CompanySettings } from '@/lib/types';
+import type { Cleaner, Staff, Job, Client, Kpi, NavLink, Invoice, Bill, Quote, CompanySettings } from '@/lib/types';
 import { db } from '@/lib/firebase';
 import {
   collection,
@@ -43,6 +43,7 @@ export const navLinks: NavLink[] = [
 // Firebase collection names
 const COLLECTIONS = {
   cleaners: 'cleaners',
+  staff: 'staff',
   jobs: 'jobs',
   clients: 'clients',
   invoices: 'invoices',
@@ -108,6 +109,84 @@ export const deleteCleaner = async (id: string): Promise<void> => {
   } catch (error) {
     console.error('Error deleting cleaner:', error);
     throw error;
+  }
+};
+
+// STAFF FUNCTIONS
+export const getStaff = async (): Promise<Staff[]> => {
+  try {
+    const querySnapshot = await getDocs(collection(db, COLLECTIONS.staff));
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      avatar: doc.data().avatar || `https://ui-avatars.io/api/?name=${encodeURIComponent(doc.data().name || 'User')}&background=E6E6FA&color=800000`
+    })) as Staff[];
+  } catch (error) {
+    console.error('Error fetching staff:', error);
+    return [];
+  }
+};
+
+export const addStaff = async (staff: Omit<Staff, 'id'>): Promise<string> => {
+  try {
+    const docRef = await addDoc(collection(db, COLLECTIONS.staff), {
+      ...staff,
+      avatar: staff.avatar || `https://ui-avatars.io/api/?name=${encodeURIComponent(staff.name)}&background=E6E6FA&color=800000`,
+      createdAt: Timestamp.now()
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error('Error adding staff:', error);
+    throw error;
+  }
+};
+
+export const updateStaff = async (id: string, updates: Partial<Staff>): Promise<void> => {
+  try {
+    await updateDoc(doc(db, COLLECTIONS.staff, id), {
+      ...updates,
+      updatedAt: Timestamp.now()
+    });
+  } catch (error) {
+    console.error('Error updating staff:', error);
+    throw error;
+  }
+};
+
+export const deleteStaff = async (id: string): Promise<void> => {
+  try {
+    await deleteDoc(doc(db, COLLECTIONS.staff, id));
+  } catch (error) {
+    console.error('Error deleting staff:', error);
+    throw error;
+  }
+};
+
+export const initializeDijanaAsStaff = async (): Promise<void> => {
+  try {
+    // Check if Dijana already exists in staff
+    const staffSnapshot = await getDocs(
+      query(collection(db, COLLECTIONS.staff), where('email', '==', 'dijanatodorovic88@gmail.com'))
+    );
+    
+    if (staffSnapshot.empty) {
+      // Add Dijana as Owner/Manager
+      const dijanaStaff: Omit<Staff, 'id'> = {
+        name: 'Dijana Todorovic',
+        email: 'dijanatodorovic88@gmail.com',
+        position: 'Owner/Manager',
+        skills: ['Business Management', 'Operations', 'Customer Service', 'Quality Control'],
+        location: 'Sydney',
+        availability: 'Mon-Fri 8am-6pm',
+        avatar: `https://ui-avatars.io/api/?name=${encodeURIComponent('Dijana Todorovic')}&background=E6E6FA&color=800000`,
+        phone: ''
+      };
+      
+      await addStaff(dijanaStaff);
+      console.log('Dijana added to staff system as Owner/Manager');
+    }
+  } catch (error) {
+    console.error('Error initializing Dijana as staff:', error);
   }
 };
 

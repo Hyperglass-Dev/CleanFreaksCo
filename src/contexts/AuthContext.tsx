@@ -139,7 +139,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       toast({
         title: 'Account created!',
-        description: `Welcome to CleanSweepHQ, ${name}!`,
+        description: `Welcome to Clean Freaks Co, ${name}!`,
       });
     } catch (error: any) {
       toast({

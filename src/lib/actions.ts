@@ -34,8 +34,26 @@ const openai = new OpenAI({
 
 const ASSISTANT_ID = 'asst_xBRBPN1kuenXs1NNvtO3e6tw';
 
+// Test function to verify OpenAI connection
+export async function testOpenAIConnection() {
+  try {
+    const models = await openai.models.list();
+    return { success: true, message: `Connected to OpenAI. Found ${models.data.length} models.` };
+  } catch (error) {
+    console.error('OpenAI connection test failed:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
 export async function getAssistantResponse(message: string) {
     try {
+        // Check if OpenAI API key is configured
+        if (!process.env.OPENAI_API_KEY) {
+            throw new Error('OpenAI API key is not configured');
+        }
+
+        console.log('Starting assistant response generation...');
+        
         // Get current business data to provide context
         const [clients, jobs, cleaners, invoices, quotes, bills] = await Promise.all([
             getClients(),
@@ -65,7 +83,13 @@ export async function getAssistantResponse(message: string) {
         };
 
         // Create a thread
+        console.log('Creating OpenAI thread...');
         const thread = await openai.beta.threads.create();
+        console.log('Thread created with ID:', thread.id);
+        
+        if (!thread || !thread.id) {
+            throw new Error('Failed to create OpenAI thread - no thread ID returned');
+        }
 
         // Add the user message with business context
         await openai.beta.threads.messages.create(thread.id, {
@@ -78,36 +102,61 @@ Please respond as Astra, Dijana's proactive business assistant for Clean Freaks 
         });
 
         // Run the assistant
+        console.log('Creating assistant run...');
         const run = await openai.beta.threads.runs.create(thread.id, {
             assistant_id: ASSISTANT_ID,
         });
+        console.log('Run created with ID:', run.id);
+
+        if (!run || !run.id) {
+            throw new Error('Failed to create assistant run - no run ID returned');
+        }
 
         // Wait for completion using proper parameter format
+        console.log('Retrieving run status...');
         // @ts-ignore - OpenAI types issue
         let runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
         
         while (runStatus.status === 'in_progress' || runStatus.status === 'queued') {
+            console.log('Run status:', runStatus.status, '- waiting...');
             await new Promise(resolve => setTimeout(resolve, 1000));
             // @ts-ignore - OpenAI types issue
             runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
         }
 
+        console.log('Final run status:', runStatus.status);
+
         if (runStatus.status === 'completed') {
+            console.log('Run completed successfully, fetching messages...');
             // Get the assistant's response
             const messages = await openai.beta.threads.messages.list(thread.id);
+            console.log('Messages retrieved, count:', messages.data.length);
+            
             const assistantMessage = messages.data[0];
             
-            if (assistantMessage.content[0].type === 'text') {
+            if (assistantMessage && assistantMessage.content[0] && assistantMessage.content[0].type === 'text') {
+                console.log('Assistant response retrieved successfully');
                 return { 
                     success: true, 
                     data: { response: assistantMessage.content[0].text.value }
                 };
+            } else {
+                console.log('No valid assistant message found');
             }
+        } else if (runStatus.status === 'failed') {
+            console.error('Assistant run failed:', runStatus.last_error);
+            return { success: false, error: 'Assistant run failed: ' + (runStatus.last_error?.message || 'Unknown error') };
+        } else {
+            console.error('Unexpected run status:', runStatus.status);
         }
 
         return { success: false, error: 'Assistant run failed or returned unexpected format.' };
     } catch (error) {
         console.error('Assistant error:', error);
-        return { success: false, error: 'Failed to get assistant response. Please check your OpenAI API key.' };
+        if (error instanceof Error) {
+            console.error('Error message:', error.message);
+            console.error('Error stack:', error.stack);
+        }
+        return { success: false, error: 'Failed to get assistant response. Error: ' + (error instanceof Error ? error.message : 'Unknown error') };
     }
 }

@@ -14,7 +14,7 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { getCleaners, addCleaner, updateCleaner } from '@/lib/data';
+import { getStaff, addStaff, updateStaff, initializeDijanaAsStaff } from '@/lib/data';
 import { MoreHorizontal, PlusCircle } from 'lucide-react';
 import {
   DropdownMenu,
@@ -22,22 +22,25 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import type { Cleaner } from '@/lib/types';
+import type { Staff } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
 import { StaffDialog } from '@/components/staff-dialog';
 import { useToast } from '@/hooks/use-toast';
 
 export default function StaffPage() {
-  const [staff, setStaff] = useState<Cleaner[]>([]);
+  const [staff, setStaff] = useState<Staff[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedStaff, setSelectedStaff] = useState<Cleaner | null>(null);
+  const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
     const loadStaff = async () => {
       try {
-        const staffData = await getCleaners();
+        // Initialize Dijana as staff if not already present
+        await initializeDijanaAsStaff();
+        
+        const staffData = await getStaff();
         setStaff(staffData);
       } catch (error) {
         console.error('Error loading staff:', error);
@@ -55,21 +58,21 @@ export default function StaffPage() {
     setIsDialogOpen(true);
   };
 
-  const handleEditStaff = (staffMember: Cleaner) => {
+  const handleEditStaff = (staffMember: Staff) => {
     setSelectedStaff(staffMember);
     setIsDialogOpen(true);
   };
 
-  const handleSaveStaff = async (staffMember: Cleaner) => {
+  const handleSaveStaff = async (staffMember: Staff) => {
     try {
       if (staffMember.id) {
         // Edit existing staff
-        await updateCleaner(staffMember.id, staffMember);
+        await updateStaff(staffMember.id, staffMember);
         setStaff(staff.map(s => s.id === staffMember.id ? staffMember : s));
         toast({ title: "Staff Updated", description: `${staffMember.name}'s details have been updated.`});
       } else {
         // Add new staff
-        const newStaffId = await addCleaner(staffMember);
+        const newStaffId = await addStaff(staffMember);
         const newStaff = { ...staffMember, id: newStaffId };
         setStaff([...staff, newStaff]);
         toast({ title: "Staff Added", description: `${staffMember.name} has been added to your team.`});
@@ -94,6 +97,7 @@ export default function StaffPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Staff Member</TableHead>
+                <TableHead>Position</TableHead>
                 <TableHead className="hidden md:table-cell">Skills</TableHead>
                 <TableHead><span className="sr-only">Actions</span></TableHead>
               </TableRow>
@@ -101,13 +105,13 @@ export default function StaffPage() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center py-6">
+                  <TableCell colSpan={4} className="text-center py-6">
                     Loading staff...
                   </TableCell>
                 </TableRow>
               ) : staff.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center py-6">
+                  <TableCell colSpan={4} className="text-center py-6">
                     No staff members found. Add your first team member to get started.
                   </TableCell>
                 </TableRow>
@@ -122,9 +126,14 @@ export default function StaffPage() {
                       </Avatar>
                       <div>
                         <div className="font-medium">{member.name}</div>
-                        <div className="text-sm text-muted-foreground">{member.location}</div>
+                        <div className="text-sm text-muted-foreground">{member.email}</div>
                       </div>
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={member.position === 'Owner/Manager' ? 'default' : member.position === 'Staff' ? 'secondary' : 'outline'}>
+                      {member.position}
+                    </Badge>
                   </TableCell>
                   <TableCell className="hidden md:table-cell">
                      <div className="flex flex-wrap gap-1">

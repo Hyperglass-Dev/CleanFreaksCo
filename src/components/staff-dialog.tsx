@@ -15,29 +15,47 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Upload } from 'lucide-react';
-import type { Cleaner } from '@/lib/types';
+import type { Staff, StaffPosition } from '@/lib/types';
 import { Textarea } from './ui/textarea';
 import { Badge } from './ui/badge';
 import { X } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useAuth } from '@/contexts/AuthContext';
 
 type StaffDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  staff: Cleaner | null;
-  onSave: (staff: Cleaner) => void;
+  staff: Staff | null;
+  onSave: (staff: Staff) => void;
 };
 
 export function StaffDialog({ open, onOpenChange, staff, onSave }: StaffDialogProps) {
-  const [formData, setFormData] = useState<Partial<Cleaner>>({});
+  const [formData, setFormData] = useState<Partial<Staff>>({});
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [skillInput, setSkillInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { signUp } = useAuth();
 
   useEffect(() => {
     if (staff) {
       setFormData(staff);
       setAvatarPreview(staff.avatar);
     } else {
-      setFormData({ name: '', skills: [], location: '', availability: '', avatar: 'https://ui-avatars.io/api/?name=User&background=E6E6FA&color=800000&size=150' });
+      setFormData({ 
+        name: '', 
+        email: '',
+        position: 'Staff',
+        skills: [], 
+        location: '', 
+        availability: '', 
+        avatar: 'https://ui-avatars.io/api/?name=User&background=E6E6FA&color=800000&size=150' 
+      });
       setAvatarPreview('https://ui-avatars.io/api/?name=User&background=E6E6FA&color=800000&size=150');
     }
   }, [staff, open]);
@@ -71,9 +89,28 @@ export function StaffDialog({ open, onOpenChange, staff, onSave }: StaffDialogPr
     setFormData(prev => ({ ...prev, skills: prev.skills?.filter(skill => skill !== skillToRemove)}));
   }
 
-  const handleSave = () => {
-    onSave(formData as Cleaner);
-    onOpenChange(false);
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      // For new staff members, create Firebase account
+      if (!staff && formData.email) {
+        const tempPassword = Math.random().toString(36).slice(-8) + 'A1!'; // Generate temporary password
+        try {
+          const userRole = formData.position === 'Owner/Manager' ? 'admin' : 'staff';
+          await signUp(formData.email, tempPassword, formData.name || '', userRole);
+        } catch (error) {
+          console.error('Error creating Firebase user:', error);
+          // Continue with staff creation even if Firebase user creation fails
+        }
+      }
+      
+      onSave(formData as Staff);
+      onOpenChange(false);
+    } catch (error) {
+      console.error('Error saving staff:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -106,6 +143,27 @@ export function StaffDialog({ open, onOpenChange, staff, onSave }: StaffDialogPr
                 <Input id="name" value={formData.name || ''} onChange={handleInputChange} />
             </div>
             <div className="grid gap-2">
+                <Label htmlFor="email">Email Address</Label>
+                <Input id="email" type="email" value={formData.email || ''} onChange={handleInputChange} placeholder="john@example.com" />
+            </div>
+            <div className="grid gap-2">
+                <Label htmlFor="position">Position</Label>
+                <Select value={formData.position || 'Staff'} onValueChange={(value: StaffPosition) => setFormData(prev => ({ ...prev, position: value }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select position" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Owner/Manager">Owner/Manager</SelectItem>
+                    <SelectItem value="Staff">Staff</SelectItem>
+                    <SelectItem value="Contractor">Contractor</SelectItem>
+                  </SelectContent>
+                </Select>
+            </div>
+            <div className="grid gap-2">
+                <Label htmlFor="phone">Phone Number (Optional)</Label>
+                <Input id="phone" type="tel" value={formData.phone || ''} onChange={handleInputChange} placeholder="+61 400 000 000" />
+            </div>
+            <div className="grid gap-2">
                 <Label htmlFor="location">Location</Label>
                 <Input id="location" value={formData.location || ''} onChange={handleInputChange} placeholder="e.g. Sydney CBD, North Shore" />
             </div>
@@ -133,8 +191,10 @@ export function StaffDialog({ open, onOpenChange, staff, onSave }: StaffDialogPr
             </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={handleSave}>Save</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>Cancel</Button>
+          <Button onClick={handleSave} disabled={loading}>
+            {loading ? 'Saving...' : 'Save'}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

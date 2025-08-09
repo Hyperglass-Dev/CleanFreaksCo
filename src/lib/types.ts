@@ -13,10 +13,13 @@ export interface Cleaner {
 export interface Staff {
   id?: string;
   name: string;
+  email: string;
+  position: StaffPosition;
   skills: string[];
   location: string;
   availability: string;
   avatar: string;
+  phone?: string;
 }
 
 export interface Job {
@@ -92,6 +95,8 @@ export interface CompanySettings {
 
 export type UserRole = 'admin' | 'staff' | 'customer';
 
+export type StaffPosition = 'Owner/Manager' | 'Staff' | 'Contractor';
+
 export interface User {
     uid: string;
     email: string;
@@ -112,4 +117,15 @@ export interface AuthContextType {
     signOut: () => Promise<void>;
     resetPassword: (email: string) => Promise<void>;
     updateUserRole: (uid: string, role: UserRole) => Promise<void>;
+}
+
+export interface RevenueData {
+    month: string;
+    revenue: number;
+}
+
+export interface BookingData {
+    service: string;
+    bookings: number;
+    fill: string;
 }

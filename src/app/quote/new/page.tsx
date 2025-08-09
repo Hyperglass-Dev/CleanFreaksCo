@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { clients } from '@/lib/data';
+import { PlusCircle, Trash2 } from 'lucide-react';
 
 export default function NewQuotePage() {
   return (
@@ -55,14 +56,20 @@ export default function NewQuotePage() {
             </div>
              <div className="space-y-2">
               <Label>Line Items</Label>
-              <div className="p-2 border rounded-lg space-y-4">
+              <div className="p-4 border rounded-lg space-y-4 bg-muted/50">
                  <div className="grid grid-cols-12 gap-2 items-center">
-                    <div className="col-span-6"><Input placeholder="Service or Item Description" /></div>
+                    <div className="col-span-5"><Input placeholder="Service or Item Description" /></div>
                     <div className="col-span-2"><Input type="number" placeholder="Qty" defaultValue="1" /></div>
                     <div className="col-span-2"><Input type="number" placeholder="Price" /></div>
                     <div className="col-span-2 text-right font-medium">$0.00</div>
+                     <div className="col-span-1 flex justify-end">
+                        <Button variant="ghost" size="icon"><Trash2 className="w-4 h-4 text-destructive"/></Button>
+                    </div>
                  </div>
-                 <Button variant="outline" size="sm">Add Line Item</Button>
+                 <Button variant="outline" size="sm" className="bg-background">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Add Line Item
+                </Button>
               </div>
             </div>
             <div className="space-y-2">
@@ -70,16 +77,16 @@ export default function NewQuotePage() {
               <Textarea id="notes" placeholder="e.g., Quote is valid for 30 days." />
             </div>
              <div className="flex justify-end">
-                <div className="w-full max-w-xs space-y-2">
+                <div className="w-full max-w-sm space-y-2">
                     <div className="flex justify-between">
-                        <span>Subtotal</span>
+                        <span className="text-muted-foreground">Subtotal</span>
                         <span>$0.00</span>
                     </div>
                      <div className="flex justify-between">
-                        <span>GST (10%)</span>
+                        <span className="text-muted-foreground">GST (10%)</span>
                         <span>$0.00</span>
                     </div>
-                     <div className="flex justify-between font-bold text-lg">
+                     <div className="flex justify-between font-bold text-lg border-t pt-2 mt-2">
                         <span>Total</span>
                         <span>$0.00</span>
                     </div>

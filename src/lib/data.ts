@@ -1,17 +1,16 @@
 
-import type { Cleaner, Job, Client, Kpi, NavLink, Invoice, Bill } from '@/lib/types';
+import type { Cleaner, Job, Client, Kpi, NavLink, Invoice, Bill, Quote, CompanySettings } from '@/lib/types';
 import {
   LayoutDashboard,
   Calendar,
   ClipboardList,
   Users,
   BellRing,
-  FileText,
-  DollarSign,
-  BookOpen,
+  Settings,
   Receipt,
   FileWarning,
-  Settings,
+  DollarSign,
+  BookOpen,
 } from 'lucide-react';
 
 export const navLinks: NavLink[] = [
@@ -21,7 +20,6 @@ export const navLinks: NavLink[] = [
   { href: '/run-sheet', label: 'Run Sheet', icon: ClipboardList },
   { href: '/clients', label: 'Clients', icon: Users },
   { href: '/reminders', label: 'Reminders', icon: BellRing },
-  { href: '/quote', label: 'Request Quote', icon: FileText },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -221,8 +219,14 @@ export const bills: Bill[] = [
     { id: 'bill-3', supplierName: 'Uniform Providers', amount: 250, dueDate: '2024-07-25', status: 'Paid' },
 ];
 
+export const quotes: Quote[] = [
+    { id: 'quote-1', clientName: 'Willow Creek Bistro', amount: 800, expiryDate: '2024-08-15', status: 'Sent' },
+    { id: 'quote-2', clientName: 'Elm Tech Park', amount: 2500, expiryDate: '2024-08-20', status: 'Draft' },
+    { id: 'quote-3', clientName: 'Spruce Industries', amount: 1800, expiryDate: '2024-07-25', status: 'Accepted' },
+];
+
 // Mock company settings data
-export const companySettings = {
+export const companySettings: CompanySettings = {
     name: 'Clean Freaks Co',
     abn: '12 345 678 901',
     address: '123 Cleaning Ave, Sydney NSW 2000',
@@ -230,4 +234,5 @@ export const companySettings = {
     email: 'contact@cleanfreaks.co',
     website: 'https://cleanfreaks.co',
     logo: 'https://placehold.co/150x150.png',
+    bankDetails: 'Bank: Example Bank\nAccount Name: Clean Freaks Co\nBSB: 123-456\nAccount: 12345678',
 };

@@ -60,6 +60,14 @@ export interface Bill {
     status: 'Paid' | 'Unpaid';
 }
 
+export interface Quote {
+    id: string;
+    clientName: string;
+    amount: number;
+    expiryDate: string;
+    status: 'Draft' | 'Sent' | 'Accepted' | 'Declined';
+}
+
 export interface CompanySettings {
     name: string;
     abn: string;
@@ -68,4 +76,5 @@ export interface CompanySettings {
     email: string;
     website: string;
     logo: string;
+    bankDetails: string;
 }

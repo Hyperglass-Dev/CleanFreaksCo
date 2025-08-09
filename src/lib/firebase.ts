@@ -1,5 +1,6 @@
 // src/lib/firebase.ts
 import { initializeApp, getApps } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
   projectId: "cleansweephq-dmwr4",
@@ -10,10 +11,13 @@ const firebaseConfig = {
   messagingSenderId: "711544861338",
 };
 
+
 // Initialize Firebase
 let app;
 if (!getApps().length) {
   app = initializeApp(firebaseConfig);
 }
 
-export { app };
+const auth = getAuth(app);
+
+export { app, auth };

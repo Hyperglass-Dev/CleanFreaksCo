@@ -1,13 +1,15 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Bot, User, Send, Loader2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { getAssistantResponse } from '@/lib/actions';
+import { useToast } from '@/hooks/use-toast';
 
 interface Message {
     sender: 'user' | 'assistant';
@@ -17,21 +19,30 @@ interface Message {
 export default function AssistantPage() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const [isPending, startTransition] = useTransition();
+    const { toast } = useToast();
 
     const handleSendMessage = () => {
         if (input.trim() === '') return;
 
-        const newMessages = [...messages, { sender: 'user' as 'user', text: input }];
+        const newMessages: Message[] = [...messages, { sender: 'user', text: input }];
         setMessages(newMessages);
+        const currentInput = input;
         setInput('');
-        setIsLoading(true);
 
-        // Mock AI response
-        setTimeout(() => {
-            setMessages([...newMessages, { sender: 'assistant' as 'assistant', text: "This is a placeholder response from your AI assistant. Once you connect a real AI model, I'll be able to provide helpful information and complete tasks for you." }]);
-            setIsLoading(false);
-        }, 1500);
+        startTransition(async () => {
+            const response = await getAssistantResponse(currentInput);
+            if (response.success && response.data) {
+                setMessages([...newMessages, { sender: 'assistant', text: response.data.response }]);
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Error',
+                    description: response.error,
+                });
+                 setMessages(messages); // Revert to previous state on error
+            }
+        });
     };
 
     return (
@@ -60,7 +71,7 @@ export default function AssistantPage() {
                             )}
                         </div>
                     ))}
-                    {isLoading && (
+                    {isPending && (
                          <div className="flex items-start gap-3">
                             <Avatar>
                                 <AvatarFallback><Bot /></AvatarFallback>
@@ -80,9 +91,10 @@ export default function AssistantPage() {
                             onChange={(e) => setInput(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                             className="flex-1"
+                            disabled={isPending}
                         />
-                        <Button type="submit" onClick={handleSendMessage} disabled={isLoading}>
-                            <Send className="w-4 h-4" />
+                        <Button type="submit" onClick={handleSendMessage} disabled={isPending || !input.trim()}>
+                            {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                             <span className="sr-only">Send</span>
                         </Button>
                     </div>

@@ -89,3 +89,27 @@ export interface CompanySettings {
     logo: string;
     bankDetails: string;
 }
+
+export type UserRole = 'admin' | 'staff' | 'customer';
+
+export interface User {
+    uid: string;
+    email: string;
+    name: string;
+    role: UserRole;
+    avatar?: string;
+    phone?: string;
+    address?: string;
+    createdAt: string;
+    lastLoginAt?: string;
+}
+
+export interface AuthContextType {
+    user: User | null;
+    loading: boolean;
+    signIn: (email: string, password: string) => Promise<void>;
+    signUp: (email: string, password: string, name: string, role?: UserRole) => Promise<void>;
+    signOut: () => Promise<void>;
+    resetPassword: (email: string) => Promise<void>;
+    updateUserRole: (uid: string, role: UserRole) => Promise<void>;
+}

@@ -12,6 +12,7 @@ import {
   UserPlus,
   Receipt,
   FileWarning,
+  Settings,
 } from 'lucide-react';
 
 export const navLinks: NavLink[] = [
@@ -22,6 +23,7 @@ export const navLinks: NavLink[] = [
   { href: '/clients', label: 'Clients', icon: Users },
   { href: '/reminders', label: 'Reminders', icon: BellRing },
   { href: '/quote', label: 'Request Quote', icon: FileText },
+  { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
 export const cleaners: Cleaner[] = [
@@ -219,3 +221,14 @@ export const bills: Bill[] = [
     { id: 'bill-2', supplierName: 'Vehicle Maintenance Inc.', amount: 500, dueDate: '2024-08-20', status: 'Unpaid' },
     { id: 'bill-3', supplierName: 'Uniform Providers', amount: 250, dueDate: '2024-07-25', status: 'Paid' },
 ];
+
+// Mock company settings data
+export const companySettings = {
+    name: 'Clean Freaks Co',
+    abn: '12 345 678 901',
+    address: '123 Cleaning Ave, Sydney NSW 2000',
+    phone: '02 9876 5432',
+    email: 'contact@cleanfreaks.co',
+    website: 'https://cleanfreaks.co',
+    logo: 'https://placehold.co/150x150.png',
+};

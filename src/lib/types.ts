@@ -59,3 +59,13 @@ export interface Bill {
     dueDate: string;
     status: 'Paid' | 'Unpaid';
 }
+
+export interface CompanySettings {
+    name: string;
+    abn: string;
+    address: string;
+    phone: string;
+    email: string;
+    website: string;
+    logo: string;
+}

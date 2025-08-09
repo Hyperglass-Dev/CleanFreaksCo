@@ -114,13 +114,16 @@ Please respond as Astra, Dijana's proactive business assistant for Clean Freaks 
 
         // Wait for completion using proper parameter format
         console.log('Retrieving run status...');
-        // @ts-ignore - OpenAI types issue
+        console.log('Thread ID:', thread.id, 'Run ID:', run.id);
+        
+        // Use updated OpenAI SDK format - temporarily ignore types for GPT-5 compatibility
+        // @ts-ignore - OpenAI SDK type compatibility with new GPT-5 updates
         let runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
         
         while (runStatus.status === 'in_progress' || runStatus.status === 'queued') {
             console.log('Run status:', runStatus.status, '- waiting...');
             await new Promise(resolve => setTimeout(resolve, 1000));
-            // @ts-ignore - OpenAI types issue
+            // @ts-ignore - OpenAI SDK type compatibility with new GPT-5 updates
             runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
         }
 

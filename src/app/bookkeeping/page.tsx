@@ -24,6 +24,12 @@ export default function BookkeepingPage() {
                     Create Invoice
                 </Link>
             </Button>
+            <Button asChild>
+                <Link href="/bill/new">
+                    <PlusCircle className="mr-2" />
+                    Create Bill
+                </Link>
+            </Button>
         </div>
       </PageHeader>
       <div className="grid gap-8">

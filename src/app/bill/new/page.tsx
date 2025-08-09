@@ -19,45 +19,47 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { clients } from '@/lib/data';
+import { bills } from '@/lib/data';
 import { PlusCircle, Trash2, Download, Printer } from 'lucide-react';
 
-export default function NewQuotePage() {
+export default function NewBillPage() {
+  const suppliers = [...new Set(bills.map(bill => bill.supplierName))];
+    
   return (
     <>
-       <PageHeader title="Create a New Quote">
+       <PageHeader title="Create a New Bill">
         <div className="flex items-center gap-2">
             <Button variant="outline"><Printer className="mr-2" /> Print</Button>
             <Button variant="outline"><Download className="mr-2" /> Download PDF</Button>
-            <Button>Save and Send</Button>
+            <Button>Save Bill</Button>
         </div>
       </PageHeader>
       <Card className="max-w-4xl mx-auto shadow-md">
         <CardHeader>
-          <CardTitle>Quote Details</CardTitle>
+          <CardTitle>Bill Details</CardTitle>
           <CardDescription>
-            Create a quote to send to a client. This can be converted into an invoice later.
+            Enter the details of a bill received from a supplier.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form className="grid gap-6">
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="client">Select Client</Label>
+                <Label htmlFor="supplier">Select Supplier</Label>
                 <Select>
-                  <SelectTrigger id="client">
-                    <SelectValue placeholder="Choose a client" />
+                  <SelectTrigger id="supplier">
+                    <SelectValue placeholder="Choose a supplier" />
                   </SelectTrigger>
                   <SelectContent>
-                    {clients.map(client => (
-                        <SelectItem key={client.id} value={client.id}>{client.name}</SelectItem>
+                    {suppliers.map((supplier, index) => (
+                        <SelectItem key={index} value={supplier}>{supplier}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
                <div className="space-y-2">
-                <Label htmlFor="quote-date">Quote Date</Label>
-                <Input id="quote-date" type="date" defaultValue={new Date().toISOString().substring(0, 10)} />
+                <Label htmlFor="bill-date">Bill Date</Label>
+                <Input id="bill-date" type="date" defaultValue={new Date().toISOString().substring(0, 10)} />
               </div>
             </div>
              <div className="space-y-2">
@@ -79,8 +81,8 @@ export default function NewQuotePage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="notes">Notes or Terms</Label>
-              <Textarea id="notes" placeholder="e.g., Quote is valid for 30 days." />
+              <Label htmlFor="notes">Notes or Reference</Label>
+              <Textarea id="notes" placeholder="e.g., Reference number, project details" />
             </div>
              <div className="flex justify-end">
                 <div className="w-full max-w-sm space-y-2">
@@ -101,7 +103,7 @@ export default function NewQuotePage() {
           </form>
         </CardContent>
          <CardFooter className="justify-end gap-2">
-          <Button variant="ghost">Save as Draft</Button>
+          <Button variant="ghost">Cancel</Button>
         </CardFooter>
       </Card>
     </>

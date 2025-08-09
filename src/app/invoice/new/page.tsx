@@ -20,12 +20,18 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { clients } from '@/lib/data';
-import { PlusCircle, Trash2 } from 'lucide-react';
+import { PlusCircle, Trash2, Download, Printer } from 'lucide-react';
 
 export default function NewInvoicePage() {
   return (
     <>
-      <PageHeader title="Create a New Invoice" />
+      <PageHeader title="Create a New Invoice">
+        <div className="flex items-center gap-2">
+            <Button variant="outline"><Printer className="mr-2" /> Print</Button>
+            <Button variant="outline"><Download className="mr-2" /> Download PDF</Button>
+            <Button>Save and Send</Button>
+        </div>
+      </PageHeader>
       <Card className="max-w-4xl mx-auto shadow-md">
         <CardHeader>
           <CardTitle>Invoice Details</CardTitle>
@@ -96,7 +102,6 @@ export default function NewInvoicePage() {
         </CardContent>
         <CardFooter className="justify-end gap-2">
           <Button variant="ghost">Save as Draft</Button>
-          <Button>Save and Send</Button>
         </CardFooter>
       </Card>
     </>

@@ -1,3 +1,4 @@
+
 import type { LucideIcon } from 'lucide-react';
 
 export interface Cleaner {
@@ -17,7 +18,7 @@ export interface Job {
   date: string;
   description: string;
   status: 'Unscheduled' | 'Scheduled' | 'In Progress' | 'Completed';
-  cleanerId?: string;
+  cleanerIds?: string[];
 }
 
 export interface Client {

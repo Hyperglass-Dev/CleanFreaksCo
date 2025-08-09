@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -37,9 +38,9 @@ export function AppSidebar() {
             <SidebarMenuItem key={link.href}>
               <SidebarMenuButton
                 asChild
-                isActive={pathname === link.href}
+                isActive={pathname.startsWith(link.href) && (link.href !== '/' || pathname === '/')}
                 tooltip={link.label}
-                className={cn(pathname === link.href && "bg-sidebar-accent text-sidebar-accent-foreground")}
+                className={cn(pathname.startsWith(link.href) && (link.href !== '/' || pathname === '/') && "bg-sidebar-accent text-sidebar-accent-foreground")}
               >
                 <Link href={link.href}>
                   <link.icon className="w-5 h-5" />
@@ -54,14 +55,14 @@ export function AppSidebar() {
       <SidebarFooter>
          <div className="flex items-center gap-3 p-3 transition-colors rounded-md hover:bg-sidebar-accent">
             <Avatar className="w-9 h-9">
-              <AvatarImage src="https://i.pravatar.cc/150?u=admin" alt="Admin" />
+              <AvatarImage src="https://i.pravatar.cc/150?u=admin" alt="Dijana" />
               <AvatarFallback>
-                <User />
+                D
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col overflow-hidden text-sm">
-                <span className="font-semibold truncate">Admin User</span>
-                <span className="text-muted-foreground truncate">admin@cleanfreaks.co</span>
+                <span className="font-semibold truncate">Dijana</span>
+                <span className="text-muted-foreground truncate">dijana@cleanfreaks.co</span>
             </div>
          </div>
       </SidebarFooter>

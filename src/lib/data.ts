@@ -10,6 +10,9 @@ import {
   FileWarning,
   DollarSign,
   BookOpen,
+  Bot,
+  User,
+  Users2,
 } from 'lucide-react';
 
 export const navLinks: NavLink[] = [
@@ -18,6 +21,8 @@ export const navLinks: NavLink[] = [
   { href: '/bookkeeping', label: 'Bookkeeping', icon: Receipt },
   { href: '/run-sheet', label: 'Run Sheet', icon: ClipboardList },
   { href: '/clients', label: 'Clients', icon: Users },
+  { href: '/staff', label: 'Staff', icon: Users2 },
+  { href: '/assistant', label: 'Assistant', icon: Bot },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -65,7 +70,7 @@ export const jobs: Job[] = [
     date: '2024-07-29',
     description: 'Standard office cleaning. Focus on conference rooms.',
     status: 'Scheduled',
-    cleanerId: 'cleaner-1',
+    cleanerIds: ['cleaner-1'],
   },
   {
     id: 'job-2',
@@ -75,7 +80,7 @@ export const jobs: Job[] = [
     date: '2024-07-29',
     description: 'Move-out deep clean for apartment 3B.',
     status: 'In Progress',
-    cleanerId: 'cleaner-2',
+    cleanerIds: ['cleaner-2'],
   },
   {
     id: 'job-3',
@@ -85,7 +90,7 @@ export const jobs: Job[] = [
     date: '2024-07-29',
     description: 'Weekly retail space cleaning. High-traffic areas.',
     status: 'Completed',
-    cleanerId: 'cleaner-3'
+    cleanerIds: ['cleaner-3']
   },
   {
     id: 'job-4',
@@ -95,7 +100,7 @@ export const jobs: Job[] = [
     date: '2024-07-30',
     description: 'Residential deep clean. 3 bed, 2 bath.',
     status: 'Scheduled',
-    cleanerId: 'cleaner-4',
+    cleanerIds: ['cleaner-4'],
   },
   {
     id: 'job-5',
@@ -105,6 +110,7 @@ export const jobs: Job[] = [
     date: 'N/A',
     description: 'Emergency cleanup after event. Requires two cleaners.',
     status: 'Unscheduled',
+    cleanerIds: ['cleaner-1', 'cleaner-3'],
   },
   {
     id: 'job-6',

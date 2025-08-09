@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +13,7 @@ const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri"];
 const getJobForSlot = (cleanerId: string, dayIndex: number, time: string) => {
     // This is a mock implementation. A real app would parse dates and times.
     const job = jobs.find(j => 
-        j.cleanerId === cleanerId && 
+        j.cleanerIds?.includes(cleanerId) && 
         j.time.startsWith(time.split(' ')[0])
     );
     if(job && (job.id === 'job-1' && dayIndex === 0 && time === '9 AM')) return job;
@@ -31,25 +32,25 @@ export function SchedulingCalendar() {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="min-w-[150px]">Cleaner</TableHead>
+                                <TableHead className="min-w-[150px] sticky left-0 bg-card z-10">Cleaner</TableHead>
                                 {weekDays.map(day => <TableHead key={day}>{day}</TableHead>)}
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {cleaners.map(cleaner => (
                                 <TableRow key={cleaner.id}>
-                                    <TableCell className="font-semibold">{cleaner.name}</TableCell>
+                                    <TableCell className="font-semibold sticky left-0 bg-card z-10">{cleaner.name}</TableCell>
                                     {weekDays.map((day, dayIndex) => (
-                                        <TableCell key={day} className="p-0">
+                                        <TableCell key={day} className="p-0 align-top">
                                             <div className="grid grid-rows-8">
                                                 {timeSlots.map(time => {
                                                     const job = getJobForSlot(cleaner.id, dayIndex, time);
                                                     return (
-                                                        <div key={time} className="h-20 p-1 border-b border-t border-dashed border-border/50 text-xs">
+                                                        <div key={time} className="h-24 p-1 border-b border-t border-dashed border-border/50 text-xs">
                                                             {job && (
-                                                                <div className="h-full p-2 rounded-md bg-secondary text-secondary-foreground">
+                                                                <div className="h-full p-2 rounded-md bg-secondary text-secondary-foreground text-pretty">
                                                                     <p className="font-bold truncate">{job.clientName}</p>
-                                                                    <p className="truncate text-muted-foreground">{job.description}</p>
+                                                                    <p className="text-wrap">{job.description}</p>
                                                                 </div>
                                                             )}
                                                         </div>

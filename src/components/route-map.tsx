@@ -51,6 +51,7 @@ export function RouteMap({ jobs, loading }: RouteMapProps) {
       zoom: 12,
       center: { lat: -33.8688, lng: 151.2093 }, // Sydney default
       mapTypeId: 'roadmap',
+      mapId: '45d96433875fef9af3c0d13a', // Clean Freaks Co map styling
       styles: [
         {
           featureType: 'poi',

@@ -57,7 +57,8 @@ export function AddressAutocomplete({
       {
         types: ['address'],
         componentRestrictions: { country: 'au' }, // Restrict to Australia
-        fields: ['formatted_address', 'address_components', 'geometry']
+        fields: ['formatted_address', 'address_components', 'geometry'],
+        mapId: '45d96433875fef9af3c0d13a' // Clean Freaks Co map styling
       }
     );
 

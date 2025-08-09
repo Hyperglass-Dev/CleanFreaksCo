@@ -16,6 +16,7 @@ import {
   X
 } from 'lucide-react';
 import { getJobs, getInvoices, getClients } from '@/lib/data';
+import { getAssistantResponse } from '@/lib/actions';
 
 interface Notification {
   id: string;
@@ -145,25 +146,69 @@ export function NotificationsCard() {
         });
       }
 
-      // Daily encouragement
-      const encouragements = [
-        "You're building something amazing! Every client served is a step toward your dreams.",
-        "Your dedication to quality cleaning is making homes and lives better every day.",
-        "Remember to take breaks and celebrate your hard work - you deserve it!",
-        "Your business is growing because of your passion and commitment.",
-        "Take a moment to appreciate how far you've come in your entrepreneurial journey."
-      ];
+      // AI-powered smart insights and alerts
+      try {
+        const aiNotificationPrompt = `Based on today's business data:
+- Jobs today: ${todaysJobs.length}
+- Overdue invoices: ${overdueInvoices.length}
+- Unscheduled jobs: ${unscheduledJobs.length}  
+- Total clients: ${clients.length}
+- Tomorrow's jobs: ${tomorrowsJobs.length}
 
-      const todayEncouragement = encouragements[new Date().getDate() % encouragements.length];
-      
-      newNotifications.push({
-        id: 'daily-encouragement',
-        type: 'success',
-        title: 'Daily Inspiration 💪',
-        message: todayEncouragement,
-        timestamp: new Date().toISOString(),
-        read: false
-      });
+Generate 1-2 smart business notifications. Include:
+1. One actionable business insight or alert
+2. One encouraging/motivational message
+
+Keep each notification under 80 characters. Focus on what needs immediate attention or celebration. Return as JSON:
+{"notifications": [{"type": "info|warning|success", "title": "Title", "message": "Message"}]}`;
+
+        const aiResponse = await getAssistantResponse(aiNotificationPrompt);
+        
+        if (aiResponse.success && aiResponse.data?.response) {
+          try {
+            const aiData = JSON.parse(aiResponse.data.response);
+            if (aiData.notifications && Array.isArray(aiData.notifications)) {
+              aiData.notifications.forEach((aiNotif: any, index: number) => {
+                newNotifications.push({
+                  id: `ai-notification-${index}`,
+                  type: aiNotif.type || 'info',
+                  title: aiNotif.title || 'AI Insight',
+                  message: aiNotif.message || 'Smart recommendation available.',
+                  timestamp: new Date().toISOString(),
+                  read: false
+                });
+              });
+            }
+          } catch (parseError) {
+            // Fallback to static encouragement if AI parsing fails
+            console.log('AI notification parsing failed, using fallback');
+          }
+        }
+      } catch (error) {
+        console.log('AI notifications failed, using fallback:', error);
+      }
+
+      // Fallback daily encouragement if AI fails
+      if (!newNotifications.find(n => n.id.startsWith('ai-notification'))) {
+        const encouragements = [
+          "You're building something amazing! Every client served is a step toward your dreams.",
+          "Your dedication to quality cleaning is making homes and lives better every day.",
+          "Remember to take breaks and celebrate your hard work - you deserve it!",
+          "Your business is growing because of your passion and commitment.",
+          "Take a moment to appreciate how far you've come in your entrepreneurial journey."
+        ];
+
+        const todayEncouragement = encouragements[new Date().getDate() % encouragements.length];
+        
+        newNotifications.push({
+          id: 'daily-encouragement',
+          type: 'success',
+          title: 'Daily Inspiration 💪',
+          message: todayEncouragement,
+          timestamp: new Date().toISOString(),
+          read: false
+        });
+      }
 
       setNotifications(newNotifications);
     } catch (error) {

@@ -1,3 +1,4 @@
+
 import type { Cleaner, Job, Client, Kpi, NavLink, Invoice, Bill } from '@/lib/types';
 import {
   LayoutDashboard,
@@ -8,8 +9,6 @@ import {
   FileText,
   DollarSign,
   BookOpen,
-  UserCheck,
-  UserPlus,
   Receipt,
   FileWarning,
   Settings,

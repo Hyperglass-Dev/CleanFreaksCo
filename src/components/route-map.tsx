@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Navigation, Clock, MapPin } from 'lucide-react';
 import type { Job } from '@/lib/types';
+import { loadGoogleMapsAPI } from '@/lib/google-maps';
 
 interface RouteMapProps {
   jobs: Job[];
@@ -26,16 +27,13 @@ export function RouteMap({ jobs, loading }: RouteMapProps) {
   const [routeInfo, setRouteInfo] = useState<{distance: string, duration: string} | null>(null);
 
   useEffect(() => {
-    if (!window.google?.maps) {
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places,geometry`;
-      script.async = true;
-      script.defer = true;
-      script.onload = initializeMap;
-      document.head.appendChild(script);
-    } else {
-      initializeMap();
-    }
+    loadGoogleMapsAPI()
+      .then(() => {
+        initializeMap();
+      })
+      .catch((error) => {
+        console.error('Failed to load Google Maps:', error);
+      });
   }, []);
 
   useEffect(() => {

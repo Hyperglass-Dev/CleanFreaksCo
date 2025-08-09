@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
+import { loadGoogleMapsAPI } from '@/lib/google-maps';
 
 interface AddressAutocompleteProps {
   value: string;
@@ -30,17 +31,13 @@ export function AddressAutocomplete({
   const [autocomplete, setAutocomplete] = useState<any>(null);
 
   useEffect(() => {
-    // Load Google Places API if not already loaded
-    if (!window.google?.maps?.places) {
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`;
-      script.async = true;
-      script.defer = true;
-      script.onload = initializeAutocomplete;
-      document.head.appendChild(script);
-    } else {
-      initializeAutocomplete();
-    }
+    loadGoogleMapsAPI()
+      .then(() => {
+        initializeAutocomplete();
+      })
+      .catch((error) => {
+        console.error('Failed to load Google Maps for autocomplete:', error);
+      });
 
     return () => {
       if (autocomplete) {

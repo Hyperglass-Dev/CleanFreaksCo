@@ -35,16 +35,17 @@ export function AppSidebar() {
         <SidebarMenu>
           {navLinks.map((link) => (
             <SidebarMenuItem key={link.href}>
-              <Link href={link.href} passHref legacyBehavior>
-                <SidebarMenuButton
-                  isActive={pathname === link.href}
-                  tooltip={link.label}
-                  className={cn(pathname === link.href && "bg-sidebar-accent text-sidebar-accent-foreground")}
-                >
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === link.href}
+                tooltip={link.label}
+                className={cn(pathname === link.href && "bg-sidebar-accent text-sidebar-accent-foreground")}
+              >
+                <Link href={link.href}>
                   <link.icon className="w-5 h-5" />
                   <span>{link.label}</span>
-                </SidebarMenuButton>
-              </Link>
+                </Link>
+              </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
         </SidebarMenu>

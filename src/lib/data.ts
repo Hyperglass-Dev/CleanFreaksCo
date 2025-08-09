@@ -28,7 +28,7 @@ export const cleaners: Cleaner[] = [
     id: 'cleaner-1',
     name: 'Ana Silva',
     skills: ['Deep Cleaning', 'Window Washing', 'Carpet Cleaning'],
-    location: 'Downtown',
+    location: 'Sydney CBD',
     availability: 'Mon-Fri 9am-5pm',
     avatar: 'https://i.pravatar.cc/150?u=cleaner-1',
   },
@@ -36,7 +36,7 @@ export const cleaners: Cleaner[] = [
     id: 'cleaner-2',
     name: 'Ben Carter',
     skills: ['Standard Cleaning', 'Eco-Friendly Cleaning'],
-    location: 'North Suburbs',
+    location: 'North Shore',
     availability: 'Mon, Wed, Fri 10am-6pm',
     avatar: 'https://i.pravatar.cc/150?u=cleaner-2',
   },
@@ -44,7 +44,7 @@ export const cleaners: Cleaner[] = [
     id: 'cleaner-3',
     name: 'Carlos Diaz',
     skills: ['Deep Cleaning', 'Upholstery Cleaning', 'Post-Construction'],
-    location: 'Eastside',
+    location: 'Eastern Suburbs',
     availability: 'Tue-Sat 8am-4pm',
     avatar: 'https://i.pravatar.cc/150?u=cleaner-3',
   },
@@ -52,7 +52,7 @@ export const cleaners: Cleaner[] = [
     id: 'cleaner-4',
     name: 'Diana Evans',
     skills: ['Standard Cleaning', 'Window Washing'],
-    location: 'West End',
+    location: 'Western Suburbs',
     availability: 'Mon-Thu 9am-3pm',
     avatar: 'https://i.pravatar.cc/150?u=cleaner-4',
   },
@@ -61,8 +61,8 @@ export const cleaners: Cleaner[] = [
 export const jobs: Job[] = [
   {
     id: 'job-1',
-    clientName: 'Maplewood Inc.',
-    address: '123 Oak St, Cityville',
+    clientName: 'Sydney CBD Offices',
+    address: '123 Pitt St, Sydney NSW 2000',
     time: '9:00 AM',
     date: '2024-07-29',
     description: 'Standard office cleaning. Focus on conference rooms.',
@@ -71,8 +71,8 @@ export const jobs: Job[] = [
   },
   {
     id: 'job-2',
-    clientName: 'Pinecrest Apartments',
-    address: '456 Pine Ave, Cityville',
+    clientName: 'Parramatta Apartments',
+    address: '456 Church St, Parramatta NSW 2150',
     time: '11:00 AM',
     date: '2024-07-29',
     description: 'Move-out deep clean for apartment 3B.',
@@ -81,8 +81,8 @@ export const jobs: Job[] = [
   },
   {
     id: 'job-3',
-    clientName: 'Cedar Retail',
-    address: '789 Cedar Blvd, Cityville',
+    clientName: 'Bondi Retail',
+    address: '789 Campbell Pde, Bondi Beach NSW 2026',
     time: '2:00 PM',
     date: '2024-07-29',
     description: 'Weekly retail space cleaning. High-traffic areas.',
@@ -91,8 +91,8 @@ export const jobs: Job[] = [
   },
   {
     id: 'job-4',
-    clientName: 'Birch Home',
-    address: '101 Birch Ln, Suburbia',
+    clientName: 'Chatswood Home',
+    address: '101 Victoria Ave, Chatswood NSW 2067',
     time: '10:00 AM',
     date: '2024-07-30',
     description: 'Residential deep clean. 3 bed, 2 bath.',
@@ -101,8 +101,8 @@ export const jobs: Job[] = [
   },
   {
     id: 'job-5',
-    clientName: 'Willow Creek Bistro',
-    address: '212 Willow Way, Cityville',
+    clientName: 'Newtown Bistro',
+    address: '212 King St, Newtown NSW 2042',
     time: 'N/A',
     date: 'N/A',
     description: 'Emergency cleanup after event. Requires two cleaners.',
@@ -110,8 +110,8 @@ export const jobs: Job[] = [
   },
   {
     id: 'job-6',
-    clientName: 'Elm Tech Park',
-    address: '333 Elm Rd, Tech City',
+    clientName: 'Macquarie Park Tech',
+    address: '333 Talavera Rd, Macquarie Park NSW 2113',
     time: 'N/A',
     date: 'N/A',
     description: 'Post-construction cleaning for new office wing.',
@@ -122,41 +122,41 @@ export const jobs: Job[] = [
 export const clients: Client[] = [
   {
     id: 'client-1',
-    name: 'Maplewood Inc.',
-    email: 'contact@maplewood.com',
-    phone: '555-0101',
+    name: 'Sydney CBD Offices',
+    email: 'contact@sydneyoffices.com.au',
+    phone: '02 9123 4567',
     avatar: 'https://i.pravatar.cc/150?u=client-1',
-    address: '123 Oak St, Cityville',
+    address: '123 Pitt St, Sydney NSW 2000',
     upcomingJobs: 1,
     totalSpent: 4500,
   },
   {
     id: 'client-2',
-    name: 'Pinecrest Apartments',
-    email: 'manager@pinecrest.com',
-    phone: '555-0102',
+    name: 'Parramatta Apartments',
+    email: 'manager@parra-apartments.com.au',
+    phone: '02 9876 5432',
     avatar: 'https://i.pravatar.cc/150?u=client-2',
-    address: '456 Pine Ave, Cityville',
+    address: '456 Church St, Parramatta NSW 2150',
     upcomingJobs: 3,
     totalSpent: 12000,
   },
   {
     id: 'client-3',
-    name: 'Cedar Retail',
-    email: 'store@cedarretail.com',
-    phone: '555-0103',
+    name: 'Bondi Retail',
+    email: 'store@bondiretail.com.au',
+    phone: '02 9300 1234',
     avatar: 'https://i.pravatar.cc/150?u=client-3',
-    address: '789 Cedar Blvd, Cityville',
+    address: '789 Campbell Pde, Bondi Beach NSW 2026',
     upcomingJobs: 4,
     totalSpent: 8500,
   },
   {
     id: 'client-4',
-    name: 'Birch Home',
-    email: 'hello@birchhome.com',
-    phone: '555-0104',
+    name: 'Chatswood Home',
+    email: 'hello@chatswoodhome.com.au',
+    phone: '02 9411 5678',
     avatar: 'https://i.pravatar.cc/150?u=client-4',
-    address: '101 Birch Ln, Suburbia',
+    address: '101 Victoria Ave, Chatswood NSW 2067',
     upcomingJobs: 1,
     totalSpent: 1200,
   },
@@ -211,10 +211,10 @@ export const bookingsData = [
 ];
 
 export const invoices: Invoice[] = [
-    { id: 'inv-1', clientName: 'Maplewood Inc.', amount: 1200, dueDate: '2024-08-15', status: 'Pending' },
-    { id: 'inv-2', clientName: 'Pinecrest Apartments', amount: 750, dueDate: '2024-07-20', status: 'Paid' },
-    { id: 'inv-3', clientName: 'Cedar Retail', amount: 400, dueDate: '2024-07-10', status: 'Overdue' },
-    { id: 'inv-4', clientName: 'Birch Home', amount: 1150, dueDate: '2024-08-01', status: 'Pending' },
+    { id: 'inv-1', clientName: 'Sydney CBD Offices', amount: 1200, dueDate: '2024-08-15', status: 'Pending' },
+    { id: 'inv-2', clientName: 'Parramatta Apartments', amount: 750, dueDate: '2024-07-20', status: 'Paid' },
+    { id: 'inv-3', clientName: 'Bondi Retail', amount: 400, dueDate: '2024-07-10', status: 'Overdue' },
+    { id: 'inv-4', clientName: 'Chatswood Home', amount: 1150, dueDate: '2024-08-01', status: 'Pending' },
 ];
 
 export const bills: Bill[] = [
@@ -224,9 +224,9 @@ export const bills: Bill[] = [
 ];
 
 export const quotes: Quote[] = [
-    { id: 'quote-1', clientName: 'Willow Creek Bistro', amount: 800, expiryDate: '2024-08-15', status: 'Sent' },
-    { id: 'quote-2', clientName: 'Elm Tech Park', amount: 2500, expiryDate: '2024-08-20', status: 'Draft' },
-    { id: 'quote-3', clientName: 'Spruce Industries', amount: 1800, expiryDate: '2024-07-25', status: 'Accepted' },
+    { id: 'quote-1', clientName: 'Newtown Bistro', amount: 800, expiryDate: '2024-08-15', status: 'Sent' },
+    { id: 'quote-2', clientName: 'Macquarie Park Tech', amount: 2500, expiryDate: '2024-08-20', status: 'Draft' },
+    { id: 'quote-3', clientName: 'Surry Hills Industries', amount: 1800, expiryDate: '2024-07-25', status: 'Accepted' },
 ];
 
 // Mock company settings data

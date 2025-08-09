@@ -86,7 +86,7 @@ export default function SettingsPage() {
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="abn">Australian Business Number (ABN)</Label>
-                        <Input id="abn" value={settings.abn} onChange={handleInputChange} disabled={isAbnSet} />
+                        <Input id="abn" value={settings.abn} onChange={handleInputChange} disabled={isAbnSet} placeholder="e.g. 12 345 678 901" />
                          {isAbnSet && (
                            <p className="text-xs text-muted-foreground flex items-center gap-1.5">
                              <AlertTriangle className="w-3 h-3" /> The ABN cannot be changed once set.
@@ -96,21 +96,21 @@ export default function SettingsPage() {
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="address">Address</Label>
-                    <Input id="address" value={settings.address} onChange={handleInputChange} />
+                    <Input id="address" value={settings.address} onChange={handleInputChange} placeholder="e.g. 123 Example St, Sydney NSW 2000" />
                 </div>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div className="space-y-2">
                         <Label htmlFor="phone">Phone Number</Label>
-                        <Input id="phone" value={settings.phone} onChange={handleInputChange} />
+                        <Input id="phone" value={settings.phone} onChange={handleInputChange} placeholder="e.g. 02 9123 4567" />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="email">Email Address</Label>
-                        <Input id="email" type="email" value={settings.email} onChange={handleInputChange} />
+                        <Input id="email" type="email" value={settings.email} onChange={handleInputChange} placeholder="e.g. contact@company.com.au" />
                     </div>
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="website">Website</Label>
-                    <Input id="website" value={settings.website} onChange={handleInputChange} />
+                    <Input id="website" value={settings.website} onChange={handleInputChange} placeholder="e.g. www.company.com.au" />
                 </div>
             </div>
           </div>

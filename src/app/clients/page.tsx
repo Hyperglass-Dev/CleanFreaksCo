@@ -97,7 +97,7 @@ export default function ClientsPage() {
                   </TableCell>
                   <TableCell className="hidden sm:table-cell text-center">{client.upcomingJobs}</TableCell>
                   <TableCell className="text-right font-medium">
-                    {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(client.totalSpent)}
+                    {new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(client.totalSpent)}
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>

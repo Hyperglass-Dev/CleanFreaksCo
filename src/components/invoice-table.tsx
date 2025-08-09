@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -61,7 +62,7 @@ export function InvoiceTable() {
             ));
             toast({
                 title: 'Payment Confirmed',
-                description: `Invoice ${selectedInvoice.id} marked as paid on ${paymentDate}.`
+                description: `Invoice ${selectedInvoice.id} marked as paid on ${new Date(paymentDate).toLocaleDateString('en-AU')}.`
             });
         }
         setIsConfirmOpen(false);
@@ -90,9 +91,9 @@ export function InvoiceTable() {
                                 <TableRow key={invoice.id}>
                                     <TableCell className="font-medium">{invoice.clientName}</TableCell>
                                     <TableCell className="text-right font-medium">
-                                        {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(invoice.amount)}
+                                        {new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(invoice.amount)}
                                     </TableCell>
-                                    <TableCell className="hidden sm:table-cell">{invoice.dueDate}</TableCell>
+                                    <TableCell className="hidden sm:table-cell">{new Date(invoice.dueDate).toLocaleDateString('en-AU')}</TableCell>
                                     <TableCell className="text-center">
                                         <Badge className={cn(statusColors[invoice.status], 'py-1 px-3 text-xs')}>
                                             {invoice.status}

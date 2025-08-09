@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -60,7 +61,7 @@ export function BillTable() {
             ));
             toast({
                 title: 'Bill Paid',
-                description: `Bill ${selectedBill.id} marked as paid on ${paymentDate}.`
+                description: `Bill ${selectedBill.id} marked as paid on ${new Date(paymentDate).toLocaleDateString('en-AU')}.`
             });
         }
         setIsConfirmOpen(false);
@@ -89,9 +90,9 @@ export function BillTable() {
                                 <TableRow key={bill.id}>
                                     <TableCell className="font-medium">{bill.supplierName}</TableCell>
                                     <TableCell className="text-right font-medium">
-                                        {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(bill.amount)}
+                                        {new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(bill.amount)}
                                     </TableCell>
-                                    <TableCell className="hidden sm:table-cell">{bill.dueDate}</TableCell>
+                                    <TableCell className="hidden sm:table-cell">{new Date(bill.dueDate).toLocaleDateString('en-AU')}</TableCell>
                                     <TableCell className="text-center">
                                         <Badge className={cn(statusColors[bill.status], 'py-1 px-3 text-xs')}>
                                             {bill.status}

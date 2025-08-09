@@ -48,9 +48,9 @@ export function QuoteTable() {
                             <TableRow key={quote.id}>
                                 <TableCell className="font-medium">{quote.clientName}</TableCell>
                                 <TableCell className="text-right font-medium">
-                                    {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(quote.amount)}
+                                    {new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(quote.amount)}
                                 </TableCell>
-                                <TableCell className="hidden sm:table-cell">{quote.expiryDate}</TableCell>
+                                <TableCell className="hidden sm:table-cell">{new Date(quote.expiryDate).toLocaleDateString('en-AU')}</TableCell>
                                 <TableCell className="text-center">
                                     <Badge className={cn(statusColors[quote.status], 'py-1 px-3 text-xs')}>
                                         {quote.status}

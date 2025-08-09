@@ -1,4 +1,4 @@
-import type { Cleaner, Job, Client, Kpi, NavLink } from '@/lib/types';
+import type { Cleaner, Job, Client, Kpi, NavLink, Invoice, Bill } from '@/lib/types';
 import {
   LayoutDashboard,
   Calendar,
@@ -9,13 +9,15 @@ import {
   DollarSign,
   BookOpen,
   UserCheck,
-  Sparkles,
-  UserPlus
+  UserPlus,
+  Receipt,
+  FileWarning,
 } from 'lucide-react';
 
 export const navLinks: NavLink[] = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/scheduling', label: 'Scheduling', icon: Calendar },
+  { href: '/bookkeeping', label: 'Bookkeeping', icon: Receipt },
   { href: '/run-sheet', label: 'Run Sheet', icon: ClipboardList },
   { href: '/clients', label: 'Clients', icon: Users },
   { href: '/reminders', label: 'Reminders', icon: BellRing },
@@ -173,18 +175,18 @@ export const kpis: Kpi[] = [
     icon: BookOpen,
   },
   {
-    title: 'Staff Utilization',
-    value: '88%',
-    change: '-1.5%',
-    changeType: 'decrease',
-    icon: UserCheck,
+    title: 'Pending Invoices',
+    value: '$2,350',
+    change: '3 overdue',
+    changeType: 'increase',
+    icon: Receipt,
   },
   {
-    title: 'New Clients',
-    value: '7',
-    change: '+2',
+    title: 'Bills to Pay',
+    value: '$850',
+    change: '2 upcoming',
     changeType: 'increase',
-    icon: UserPlus,
+    icon: FileWarning,
   },
 ];
 
@@ -203,4 +205,17 @@ export const bookingsData = [
     { service: 'Windows', bookings: 12, fill: 'hsl(var(--chart-3))' },
     { service: 'Carpet', bookings: 8, fill: 'hsl(var(--chart-4))' },
     { service: 'Other', bookings: 5, fill: 'hsl(var(--chart-5))' },
+];
+
+export const invoices: Invoice[] = [
+    { id: 'inv-1', clientName: 'Maplewood Inc.', amount: 1200, dueDate: '2024-08-15', status: 'Pending' },
+    { id: 'inv-2', clientName: 'Pinecrest Apartments', amount: 750, dueDate: '2024-07-20', status: 'Paid' },
+    { id: 'inv-3', clientName: 'Cedar Retail', amount: 400, dueDate: '2024-07-10', status: 'Overdue' },
+    { id: 'inv-4', clientName: 'Birch Home', amount: 1150, dueDate: '2024-08-01', status: 'Pending' },
+];
+
+export const bills: Bill[] = [
+    { id: 'bill-1', supplierName: 'Cleaning Supplies Co.', amount: 350, dueDate: '2024-08-10', status: 'Unpaid' },
+    { id: 'bill-2', supplierName: 'Vehicle Maintenance Inc.', amount: 500, dueDate: '2024-08-20', status: 'Unpaid' },
+    { id: 'bill-3', supplierName: 'Uniform Providers', amount: 250, dueDate: '2024-07-25', status: 'Paid' },
 ];

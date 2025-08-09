@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import type { Kpi } from '@/lib/types';
 
 export function KpiCard({ kpi }: { kpi: Kpi }) {
-  const isIncrease = kpi.changeType === 'increase';
+  const isIncrease = kpi.title === 'Bills to Pay' || kpi.title === 'Pending Invoices';
   return (
     <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
       <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
@@ -15,10 +15,10 @@ export function KpiCard({ kpi }: { kpi: Kpi }) {
         <p
           className={cn(
             'text-xs text-muted-foreground mt-1',
-            isIncrease ? 'text-green-600' : 'text-red-600'
+            isIncrease ? 'text-amber-600' : (kpi.changeType === 'increase' ? 'text-green-600' : 'text-red-600')
           )}
         >
-          {kpi.change} from last month
+          {kpi.change}
         </p>
       </CardContent>
     </Card>

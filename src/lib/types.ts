@@ -43,3 +43,19 @@ export interface NavLink {
   label: string;
   icon: LucideIcon;
 }
+
+export interface Invoice {
+    id: string;
+    clientName: string;
+    amount: number;
+    dueDate: string;
+    status: 'Paid' | 'Pending' | 'Overdue';
+}
+
+export interface Bill {
+    id: string;
+    supplierName: string;
+    amount: number;
+    dueDate: string;
+    status: 'Paid' | 'Unpaid';
+}

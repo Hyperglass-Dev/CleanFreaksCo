@@ -1,5 +1,6 @@
 import type { Cleaner, Staff, Job, Client, Kpi, NavLink, Invoice, Bill, Quote, CompanySettings } from '@/lib/types';
 import { db } from '@/lib/firebase';
+import { getStaffAvatar, getClientAvatar } from '@/lib/avatar-utils';
 import {
   collection,
   doc,
@@ -69,7 +70,7 @@ export const getCleaners = async (): Promise<Cleaner[]> => {
     return querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
-      avatar: doc.data().avatar || `https://ui-avatars.io/api/?name=${encodeURIComponent(doc.data().name || 'User')}&background=E6E6FA&color=800000`
+      avatar: doc.data().avatar || getStaffAvatar(doc.data().name || 'User')
     })) as Cleaner[];
   } catch (error) {
     console.error('Error fetching cleaners:', error);
@@ -81,7 +82,7 @@ export const addCleaner = async (cleaner: Omit<Cleaner, 'id'>): Promise<string> 
   try {
     const docRef = await addDoc(collection(db, COLLECTIONS.cleaners), {
       ...cleaner,
-      avatar: cleaner.avatar || `https://ui-avatars.io/api/?name=${encodeURIComponent(cleaner.name)}&background=E6E6FA&color=800000`,
+      avatar: cleaner.avatar || getStaffAvatar(cleaner.name),
       createdAt: Timestamp.now()
     });
     return docRef.id;
@@ -123,7 +124,7 @@ export const getStaff = async (includeArchived = false): Promise<Staff[]> => {
     return querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
-      avatar: doc.data().avatar || `https://ui-avatars.io/api/?name=${encodeURIComponent(doc.data().name || 'User')}&background=E6E6FA&color=800000`
+      avatar: doc.data().avatar || getStaffAvatar(doc.data().name || 'User')
     })) as Staff[];
   } catch (error) {
     console.error('Error fetching staff:', error);
@@ -135,7 +136,7 @@ export const addStaff = async (staff: Omit<Staff, 'id'>): Promise<string> => {
   try {
     const docRef = await addDoc(collection(db, COLLECTIONS.staff), {
       ...staff,
-      avatar: staff.avatar || `https://ui-avatars.io/api/?name=${encodeURIComponent(staff.name)}&background=E6E6FA&color=800000`,
+      avatar: staff.avatar || getStaffAvatar(staff.name),
       createdAt: Timestamp.now()
     });
     return docRef.id;
@@ -194,7 +195,7 @@ export const initializeDijanaAsStaff = async (): Promise<void> => {
         skills: ['Business Management', 'Operations', 'Customer Service', 'Quality Control'],
         location: 'Sydney',
         availability: 'Mon-Fri 8am-6pm',
-        avatar: `https://ui-avatars.io/api/?name=${encodeURIComponent('Dijana Todorovic')}&background=E6E6FA&color=800000`,
+        avatar: getStaffAvatar('Dijana Todorovic'),
         phone: ''
       };
       
@@ -272,7 +273,7 @@ export const getClients = async (): Promise<Client[]> => {
     return querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
-      avatar: doc.data().avatar || `https://ui-avatars.io/api/?name=${encodeURIComponent(doc.data().name || 'Client')}&background=F8BBD0&color=800000`
+      avatar: doc.data().avatar || getClientAvatar(doc.data().name || 'Client')
     })) as Client[];
   } catch (error) {
     console.error('Error fetching clients:', error);
@@ -284,7 +285,7 @@ export const addClient = async (client: Omit<Client, 'id'>): Promise<string> => 
   try {
     const docRef = await addDoc(collection(db, COLLECTIONS.clients), {
       ...client,
-      avatar: client.avatar || `https://ui-avatars.io/api/?name=${encodeURIComponent(client.name)}&background=F8BBD0&color=800000`,
+      avatar: client.avatar || getClientAvatar(client.name),
       createdAt: Timestamp.now()
     });
     return docRef.id;

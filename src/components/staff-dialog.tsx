@@ -92,15 +92,17 @@ export function StaffDialog({ open, onOpenChange, staff, onSave }: StaffDialogPr
   const handleSave = async () => {
     setLoading(true);
     try {
-      // For new staff members, create Firebase account
+      // For new staff members, create Firebase account if needed
       if (!staff && formData.email) {
         const tempPassword = Math.random().toString(36).slice(-8) + 'A1!'; // Generate temporary password
         try {
           const userRole = formData.position === 'Owner/Manager' ? 'admin' : 'staff';
           await signUp(formData.email, tempPassword, formData.name || '', userRole);
-        } catch (error) {
-          console.error('Error creating Firebase user:', error);
-          // Continue with staff creation even if Firebase user creation fails
+        } catch (error: any) {
+          // If email already exists, that's OK - just add to staff collection
+          if (error?.code !== 'auth/email-already-in-use') {
+            console.error('Error creating Firebase user:', error);
+          }
         }
       }
       

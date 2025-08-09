@@ -16,6 +16,22 @@ export const suppressDevMessages = () => {
       originalConsoleWarn.apply(console, args);
     };
 
+    // Suppress React dev stack traces and other noise
+    const originalConsoleError = console.error;
+    console.error = (...args) => {
+      const message = args.join(' ');
+      if (
+        message.includes('react-dom-client.development.js') ||
+        message.includes('commitHookEffectListMount') ||
+        message.includes('recursivelyTraverseLayoutEffects') ||
+        message.includes('ui-avatars.io') ||
+        message.includes('net::ERR_NAME_NOT_RESOLVED')
+      ) {
+        return; // Suppress React stack traces and avatar errors
+      }
+      originalConsoleError.apply(console, args);
+    };
+
     // Suppress specific Google Maps performance warnings that we've already optimized
     const originalConsoleLog = console.log;
     console.log = (...args) => {

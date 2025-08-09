@@ -11,12 +11,20 @@ export default function BookkeepingPage() {
   return (
     <>
       <PageHeader title="Bookkeeping">
-        <Button asChild>
-            <Link href="/quote/new">
-                <PlusCircle className="mr-2" />
-                Create Quote
-            </Link>
-        </Button>
+        <div className="flex gap-2">
+            <Button asChild>
+                <Link href="/quote/new">
+                    <PlusCircle className="mr-2" />
+                    Create Quote
+                </Link>
+            </Button>
+             <Button asChild>
+                <Link href="/invoice/new">
+                    <PlusCircle className="mr-2" />
+                    Create Invoice
+                </Link>
+            </Button>
+        </div>
       </PageHeader>
       <div className="grid gap-8">
         <QuoteTable />

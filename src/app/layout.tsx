@@ -7,12 +7,12 @@ import { AppWrapper } from '@/components/AppWrapper';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'CleanSweepHQ',
-  description: 'Professional cleaning business management app',
+  title: 'Clean Freaks Co',
+  description: 'Professional cleaning services management',
   manifest: '/manifest.json',
   icons: {
-    icon: '/icon-192x192.png',
-    apple: '/icon-192x192.png',
+    icon: '/brandings/cleanfreaksco.png',
+    apple: '/brandings/cleanfreaksco.png',
   },
 };
 
@@ -38,7 +38,7 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="CleanSweepHQ" />
+        <meta name="apple-mobile-web-app-title" content="Clean Freaks Co" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
       </head>
       <body className="font-body">

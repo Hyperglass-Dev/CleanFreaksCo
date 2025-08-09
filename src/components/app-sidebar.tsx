@@ -4,6 +4,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Sparkles, User } from 'lucide-react';
+import Image from 'next/image';
 
 import {
   Sidebar,
@@ -24,9 +25,15 @@ export function AppSidebar() {
   return (
     <Sidebar side="left" variant="sidebar" collapsible="icon">
       <SidebarHeader>
-        <div className="flex items-center gap-2 p-2">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground">
-            <Sparkles className="w-5 h-5" />
+        <div className="flex items-center gap-3 p-2">
+          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-white border shadow-sm">
+            <Image
+              src="/brandings/cleanfreaksco.png"
+              alt="CleanFreaksCo"
+              width={32}
+              height={32}
+              className="w-8 h-8 object-contain"
+            />
           </div>
           <span className="text-lg font-semibold font-headline">Clean Freaks Co</span>
         </div>

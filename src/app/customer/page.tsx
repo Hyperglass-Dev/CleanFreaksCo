@@ -73,7 +73,7 @@ export default function CustomerDashboard() {
           </Avatar>
           <div>
             <h1 className="text-xl font-bold">Welcome back, {user?.name?.split(' ')[0]}!</h1>
-            <p className="text-sm text-muted-foreground">Manage your cleaning schedule</p>
+            <p className="text-sm text-muted-foreground">Clean Freaks Co - Manage your cleaning schedule</p>
           </div>
         </div>
         <div className="flex gap-2">

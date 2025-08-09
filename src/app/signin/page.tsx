@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Sparkles, Phone, Mail } from 'lucide-react';
 import { UserRole } from '@/lib/types';
+import Image from 'next/image';
 
 export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -94,11 +95,18 @@ export default function SignInPage() {
       <div className="w-full max-w-md">
         {/* Logo and Header */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Sparkles className="w-8 h-8 text-purple-600" />
-            <h1 className="text-3xl font-bold text-gray-900">CleanSweepHQ</h1>
+          <div className="flex items-center justify-center mb-4">
+            <Image
+              src="/brandings/cleanfreaksco.png"
+              alt="CleanFreaksCo"
+              width={200}
+              height={80}
+              className="h-16 w-auto"
+              priority
+            />
           </div>
-          <p className="text-gray-600">Your smart cleaning business assistant</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Clean Freaks Co</h1>
+          <p className="text-gray-600">Professional cleaning services management</p>
         </div>
 
         <Card className="shadow-lg border-0">
@@ -113,7 +121,7 @@ export default function SignInPage() {
               <CardHeader>
                 <CardTitle>Welcome back</CardTitle>
                 <CardDescription>
-                  Sign in to your CleanSweepHQ account
+                  Sign in to your Clean Freaks Co account
                 </CardDescription>
               </CardHeader>
               <form onSubmit={handleSignIn}>
@@ -171,7 +179,7 @@ export default function SignInPage() {
               <CardHeader>
                 <CardTitle>Create account</CardTitle>
                 <CardDescription>
-                  Join CleanSweepHQ and manage your cleaning business
+                  Join Clean Freaks Co and manage your cleaning business
                 </CardDescription>
               </CardHeader>
               <form onSubmit={handleSignUp}>

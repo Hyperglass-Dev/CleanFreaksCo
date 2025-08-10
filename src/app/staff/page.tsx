@@ -151,9 +151,12 @@ export default function StaffPage() {
                         <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <div className="font-medium">{member.name}</div>
-                        <div className="text-sm text-muted-foreground">{member.email}</div>
-                      </div>
+                      <div className="font-medium">{member.name}</div>
+                      <div className="text-sm text-muted-foreground">{member.email}</div>
+                        {member.suburb && (
+                           <div className="text-xs text-muted-foreground">{member.suburb}</div>
+                         )}
+                       </div>
                     </div>
                   </TableCell>
                   <TableCell>

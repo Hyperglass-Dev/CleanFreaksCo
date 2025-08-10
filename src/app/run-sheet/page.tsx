@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/page-header';
 import { JobCard } from '@/components/job-card';
-import { getJobs } from '@/lib/data';
+import { getJobs, getStaff } from '@/lib/data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,12 +13,13 @@ import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInte
 import { cn } from '@/lib/utils';
 import { RouteMap } from '@/components/route-map';
 import { useAuth } from '@/contexts/AuthContext';
-import type { Job } from '@/lib/types';
+import type { Job, Staff } from '@/lib/types';
 
 type ViewType = 'daily' | 'weekly' | 'monthly';
 
 export default function RunSheetPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [staff, setStaff] = useState<Staff[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [viewType, setViewType] = useState<ViewType>('weekly');
@@ -32,10 +33,14 @@ export default function RunSheetPage() {
 
   const loadJobs = async () => {
     try {
-      const jobsData = await getJobs();
+      const [jobsData, staffData] = await Promise.all([
+        getJobs(),
+        getStaff()
+      ]);
       setJobs(jobsData);
+      setStaff(staffData);
     } catch (error) {
-      console.error('Failed to load jobs:', error);
+      console.error('Failed to load data:', error);
     } finally {
       setLoading(false);
     }
@@ -136,6 +141,21 @@ export default function RunSheetPage() {
     return isSameDay(new Date(job.date), new Date());
   });
 
+  // Get staff address for daily planning (prioritize current user if they're staff, otherwise use first staff with address)
+  const getStaffAddressForPlanning = () => {
+    if (viewType !== 'daily') return undefined;
+    
+    // If current user is staff, use their address
+    if (user?.role === 'staff') {
+      const currentStaff = staff.find(s => s.email === user.email);
+      if (currentStaff?.address) return currentStaff.address;
+    }
+    
+    // Otherwise, find the first staff member with an address
+    const staffWithAddress = staff.find(s => s.address);
+    return staffWithAddress?.address;
+  };
+
   return (
     <>
       <PageHeader title="Run Sheet" />
@@ -235,7 +255,8 @@ export default function RunSheetPage() {
             <div className="sticky top-24">
               <RouteMap 
                 jobs={viewType === 'daily' ? filteredJobs : todaysJobsForMap} 
-                loading={loading} 
+                loading={loading}
+                staffAddress={getStaffAddressForPlanning()}
               />
             </div>
           </div>

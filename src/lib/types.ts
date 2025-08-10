@@ -20,6 +20,8 @@ export interface Staff {
   availability: string;
   avatar: string;
   phone?: string;
+  address?: string;
+  suburb?: string;
   archived?: boolean;
 }
 

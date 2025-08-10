@@ -11,6 +11,7 @@ import { loadGoogleMapsAPI } from '@/lib/google-maps';
 interface RouteMapProps {
   jobs: Job[];
   loading: boolean;
+  staffAddress?: string; // For daily planning from staff home address
 }
 
 declare global {
@@ -19,42 +20,33 @@ declare global {
   }
 }
 
-export function RouteMap({ jobs, loading }: RouteMapProps) {
-  const mapRef = useRef<HTMLDivElement>(null);
+export function RouteMap({ jobs, loading, staffAddress }: RouteMapProps) {
   const [map, setMap] = useState<any>(null);
   const [directionsService, setDirectionsService] = useState<any>(null);
   const [directionsRenderer, setDirectionsRenderer] = useState<any>(null);
   const [routeInfo, setRouteInfo] = useState<{distance: string, duration: string} | null>(null);
   const [mapError, setMapError] = useState<string | null>(null);
   const [isMapLoading, setIsMapLoading] = useState(true);
+  const [mapContainer, setMapContainer] = useState<HTMLDivElement | null>(null);
+  const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
 
+  // Initialize map when container is available
   useEffect(() => {
-    setIsMapLoading(true);
-    setMapError(null);
-    
-    loadGoogleMapsAPI()
-      .then(() => {
-        // Wait a bit for the ref to be available, then retry a few times
-        const tryInitialize = (attempts = 0) => {
-          if (mapRef.current) {
-            initializeMap();
-          } else if (attempts < 10) {
-            console.log(`Map ref not ready, retrying... (${attempts + 1}/10)`);
-            setTimeout(() => tryInitialize(attempts + 1), 100);
-          } else {
-            console.error('Map ref never became available after 10 attempts');
-            setMapError('Map container failed to initialize');
-            setIsMapLoading(false);
-          }
-        };
-        tryInitialize();
-      })
-      .catch((error) => {
-        console.error('Failed to load Google Maps:', error);
-        setMapError(`Failed to load Google Maps: ${error.message}`);
-        setIsMapLoading(false);
-      });
-  }, []);
+    if (mapContainer && !map) {
+      setIsMapLoading(true);
+      setMapError(null);
+      
+      loadGoogleMapsAPI()
+        .then(() => {
+          initializeMapWithContainer(mapContainer);
+        })
+        .catch((error) => {
+          console.error('Failed to load Google Maps:', error);
+          setMapError(`Failed to load Google Maps: ${error.message}`);
+          setIsMapLoading(false);
+        });
+    }
+  }, [mapContainer, map]);
 
   useEffect(() => {
     if (map && jobs.length > 0) {
@@ -62,16 +54,18 @@ export function RouteMap({ jobs, loading }: RouteMapProps) {
     }
   }, [map, jobs]);
 
-  const initializeMap = () => {
-    if (!mapRef.current || !window.google?.maps) {
-      console.error('Map ref or Google Maps API not available');
+  const initializeMapWithContainer = (container: HTMLDivElement) => {
+    if (!container || !window.google?.maps) {
+      console.error('Map container or Google Maps API not available');
       setMapError('Map initialization failed');
       setIsMapLoading(false);
       return;
     }
 
+    console.log('Initializing Google Maps with container:', container);
+
     try {
-      const mapInstance = new window.google.maps.Map(mapRef.current, {
+      const mapInstance = new window.google.maps.Map(container, {
         zoom: 12,
         center: { lat: -33.8688, lng: 151.2093 }, // Sydney default
         mapTypeId: 'roadmap',
@@ -109,10 +103,54 @@ export function RouteMap({ jobs, loading }: RouteMapProps) {
       setMapError(null);
       
       console.log('Google Maps initialized successfully');
+      
+      // Try to get user's current location
+      getUserLocation();
     } catch (error) {
       console.error('Error initializing map:', error);
       setMapError(`Failed to initialize map: ${error}`);
       setIsMapLoading(false);
+    }
+  };
+
+  const getUserLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const location = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          setUserLocation(location);
+          console.log('User location obtained:', location);
+          
+          // Update map center to user location
+          if (map) {
+            map.setCenter(location);
+            map.setZoom(13);
+            
+            // Add user location marker
+            new window.google.maps.Marker({
+              position: location,
+              map: map,
+              title: 'Your Location',
+              icon: {
+                path: window.google.maps.SymbolPath.CIRCLE,
+                scale: 8,
+                fillColor: '#4285F4',
+                fillOpacity: 1,
+                strokeColor: '#fff',
+                strokeWeight: 2
+              }
+            });
+          }
+        },
+        (error) => {
+          console.warn('Could not get user location:', error);
+          // Default to Sydney if geolocation fails
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+      );
     }
   };
 
@@ -124,16 +162,19 @@ export function RouteMap({ jobs, loading }: RouteMapProps) {
       
       if (jobsWithAddresses.length === 0) return;
 
+      // Clear previous routes
+      directionsRenderer.setDirections({routes: []});
+
       if (jobsWithAddresses.length === 1) {
-        // Single job - just center map on it
+        // Single job - show route from user location or just center on job
         const geocoder = new window.google.maps.Geocoder();
         geocoder.geocode({ address: jobsWithAddresses[0].address }, (results: any, status: any) => {
           if (status === 'OK' && results[0]) {
-            map.setCenter(results[0].geometry.location);
-            map.setZoom(15);
+            const jobLocation = results[0].geometry.location;
             
+            // Add job marker
             new window.google.maps.Marker({
-              position: results[0].geometry.location,
+              position: jobLocation,
               map: map,
               title: jobsWithAddresses[0].clientName,
               icon: {
@@ -145,20 +186,72 @@ export function RouteMap({ jobs, loading }: RouteMapProps) {
                 strokeWeight: 2
               }
             });
+
+            // If we have staff address or user location, show route to job
+            const routeOrigin = staffAddress || userLocation;
+            if (routeOrigin) {
+              const request = {
+                origin: routeOrigin,
+                destination: jobLocation,
+                travelMode: window.google.maps.TravelMode.DRIVING,
+                unitSystem: window.google.maps.UnitSystem.METRIC
+              };
+
+              directionsService.route(request, (result: any, status: any) => {
+                if (status === 'OK') {
+                  directionsRenderer.setDirections(result);
+                  
+                  const leg = result.routes[0].legs[0];
+                  setRouteInfo({
+                    distance: leg.distance.text,
+                    duration: leg.duration.text
+                  });
+                } else {
+                  console.error('Single job directions failed:', status);
+                }
+              });
+            } else {
+              // No user location, just center on job
+              map.setCenter(jobLocation);
+              map.setZoom(15);
+            }
           }
         });
         return;
       }
 
-      // Multiple jobs - calculate route
-      const waypoints = jobsWithAddresses.slice(1, -1).map(job => ({
-        location: job.address,
-        stopover: true
-      }));
+      // Multiple jobs - calculate optimized route
+      let origin;
+      let waypoints = [];
+      let destination = jobsWithAddresses[jobsWithAddresses.length - 1].address;
+
+      // Prioritize staff address for daily planning, then user location, then first job
+      if (staffAddress) {
+        // Start from staff home address for daily planning
+        origin = staffAddress;
+        waypoints = jobsWithAddresses.slice(0, -1).map(job => ({
+          location: job.address,
+          stopover: true
+        }));
+      } else if (userLocation) {
+        // Start from user location, visit all jobs
+        origin = userLocation;
+        waypoints = jobsWithAddresses.slice(0, -1).map(job => ({
+          location: job.address,
+          stopover: true
+        }));
+      } else {
+        // Start from first job, visit middle jobs, end at last job
+        waypoints = jobsWithAddresses.slice(1, -1).map(job => ({
+          location: job.address,
+          stopover: true
+        }));
+        origin = jobsWithAddresses[0].address;
+      }
 
       const request = {
-        origin: jobsWithAddresses[0].address,
-        destination: jobsWithAddresses[jobsWithAddresses.length - 1].address,
+        origin: origin,
+        destination: destination,
         waypoints: waypoints,
         travelMode: window.google.maps.TravelMode.DRIVING,
         optimizeWaypoints: true,
@@ -237,7 +330,9 @@ export function RouteMap({ jobs, loading }: RouteMapProps) {
                 onClick={() => {
                   setMapError(null);
                   setIsMapLoading(true);
-                  loadGoogleMapsAPI().then(initializeMap).catch(error => {
+                  loadGoogleMapsAPI().then(() => {
+                    if (mapContainer) initializeMapWithContainer(mapContainer);
+                  }).catch(error => {
                     console.error('Retry failed:', error);
                     setMapError(`Retry failed: ${error.message}`);
                     setIsMapLoading(false);
@@ -280,6 +375,7 @@ export function RouteMap({ jobs, loading }: RouteMapProps) {
             <CardTitle>Optimized Route</CardTitle>
             <CardDescription>
               {jobs.length} job{jobs.length > 1 ? 's' : ''} for today
+              {staffAddress && <span className="block text-xs mt-1">Starting from staff home address</span>}
             </CardDescription>
           </div>
           <Button 
@@ -295,8 +391,9 @@ export function RouteMap({ jobs, loading }: RouteMapProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div 
-          ref={mapRef} 
-          className="h-[400px] w-full rounded-lg border"
+          ref={setMapContainer}
+          className="h-[400px] w-full rounded-lg border bg-gray-100"
+          style={{ minHeight: '400px' }}
         />
         
         {/* Debug info in development */}
@@ -306,7 +403,9 @@ export function RouteMap({ jobs, loading }: RouteMapProps) {
             <p>API Key: {process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ? 'Set' : 'Missing'}</p>
             <p>Google Maps Loaded: {window.google?.maps ? 'Yes' : 'No'}</p>
             <p>Map Instance: {map ? 'Created' : 'Not created'}</p>
+            <p>User Location: {userLocation ? `${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}` : 'Not available'}</p>
             <p>Jobs Count: {jobs.length}</p>
+            <p>Container: {mapContainer ? 'Available' : 'Not available'}</p>
           </div>
         )}
         

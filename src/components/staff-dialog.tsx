@@ -19,6 +19,7 @@ import type { Staff, StaffPosition } from '@/lib/types';
 import { Textarea } from './ui/textarea';
 import { Badge } from './ui/badge';
 import { X } from 'lucide-react';
+import { AddressAutocomplete } from './address-autocomplete';
 import {
   Select,
   SelectContent,
@@ -55,7 +56,9 @@ export function StaffDialog({ open, onOpenChange, staff, onSave }: StaffDialogPr
         skills: [], 
         location: '', 
         availability: '', 
-        avatar: getStaffAvatar('User')
+        avatar: getStaffAvatar('User'),
+        address: '',
+        suburb: ''
       });
       setAvatarPreview(getStaffAvatar('User'));
     }
@@ -175,6 +178,23 @@ export function StaffDialog({ open, onOpenChange, staff, onSave }: StaffDialogPr
             <div className="grid gap-2">
                 <Label htmlFor="phone">Phone Number (Optional)</Label>
                 <Input id="phone" type="tel" value={formData.phone || ''} onChange={handleInputChange} placeholder="+61 400 000 000" />
+            </div>
+            <div className="grid gap-2">
+                <Label htmlFor="address">Home Address</Label>
+                <AddressAutocomplete
+                  value={formData.address || ''}
+                  onChange={(address) => {
+                    setFormData(prev => {
+                      const updated = { ...prev, address };
+                      // Extract suburb from address for display
+                      const addressParts = address.split(',');
+                      const suburb = addressParts.length > 1 ? addressParts[1].trim() : '';
+                      updated.suburb = suburb;
+                      return updated;
+                    });
+                  }}
+                  placeholder="Start typing your address..."
+                />
             </div>
             <div className="grid gap-2">
                 <Label htmlFor="location">Location</Label>

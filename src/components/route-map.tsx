@@ -25,14 +25,21 @@ export function RouteMap({ jobs, loading }: RouteMapProps) {
   const [directionsService, setDirectionsService] = useState<any>(null);
   const [directionsRenderer, setDirectionsRenderer] = useState<any>(null);
   const [routeInfo, setRouteInfo] = useState<{distance: string, duration: string} | null>(null);
+  const [mapError, setMapError] = useState<string | null>(null);
+  const [isMapLoading, setIsMapLoading] = useState(true);
 
   useEffect(() => {
+    setIsMapLoading(true);
+    setMapError(null);
+    
     loadGoogleMapsAPI()
       .then(() => {
         initializeMap();
       })
       .catch((error) => {
         console.error('Failed to load Google Maps:', error);
+        setMapError(`Failed to load Google Maps: ${error.message}`);
+        setIsMapLoading(false);
       });
   }, []);
 

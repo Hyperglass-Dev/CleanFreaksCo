@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { cleaners, jobs } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
-const timeSlots = ["9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM", "3 PM", "4 PM"];
-const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+const timeSlots = ["7 AM", "8 AM", "9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM", "3 PM", "4 PM", "5 PM", "6 PM", "7 PM"];
+const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 const getJobForSlot = (cleanerId: string, dayIndex: number, time: string) => {
     // This is a mock implementation. A real app would parse dates and times.
@@ -42,7 +42,7 @@ export function SchedulingCalendar() {
                                     <TableCell className="font-semibold sticky left-0 bg-card z-10">{cleaner.name}</TableCell>
                                     {weekDays.map((day, dayIndex) => (
                                         <TableCell key={day} className="p-0 align-top">
-                                            <div className="grid grid-rows-8">
+                                            <div className="grid grid-rows-13">
                                                 {timeSlots.map(time => {
                                                     const job = getJobForSlot(cleaner.id, dayIndex, time);
                                                     return (

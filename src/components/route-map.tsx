@@ -34,7 +34,20 @@ export function RouteMap({ jobs, loading }: RouteMapProps) {
     
     loadGoogleMapsAPI()
       .then(() => {
-        initializeMap();
+        // Wait a bit for the ref to be available, then retry a few times
+        const tryInitialize = (attempts = 0) => {
+          if (mapRef.current) {
+            initializeMap();
+          } else if (attempts < 10) {
+            console.log(`Map ref not ready, retrying... (${attempts + 1}/10)`);
+            setTimeout(() => tryInitialize(attempts + 1), 100);
+          } else {
+            console.error('Map ref never became available after 10 attempts');
+            setMapError('Map container failed to initialize');
+            setIsMapLoading(false);
+          }
+        };
+        tryInitialize();
       })
       .catch((error) => {
         console.error('Failed to load Google Maps:', error);
@@ -50,16 +63,9 @@ export function RouteMap({ jobs, loading }: RouteMapProps) {
   }, [map, jobs]);
 
   const initializeMap = () => {
-    if (!mapRef.current) {
-      console.error('Map ref not available');
-      setMapError('Map container not found');
-      setIsMapLoading(false);
-      return;
-    }
-
-    if (!window.google?.maps) {
-      console.error('Google Maps API not loaded');
-      setMapError('Google Maps API not loaded');
+    if (!mapRef.current || !window.google?.maps) {
+      console.error('Map ref or Google Maps API not available');
+      setMapError('Map initialization failed');
       setIsMapLoading(false);
       return;
     }

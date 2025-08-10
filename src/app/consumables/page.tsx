@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { getConsumablesGroupedByMonth, addConsumable, updateConsumable, deleteConsumable } from '@/lib/data';
-import { MoreHorizontal, PlusCircle, Trash2, Edit, Package, DollarSign, Calendar } from 'lucide-react';
+import { MoreHorizontal, PlusCircle, Trash2, Edit, Package, DollarSign, Calendar, Image, Download, FileText } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import type { Consumable, MonthlyGroup, PurchaseType } from '@/lib/types';
 import { ConsumableDialog } from '@/components/consumable-dialog';
+import { EofySummaryDialog } from '@/components/eofy-summary-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -34,6 +35,7 @@ export default function ConsumablesPage() {
   const [selectedConsumable, setSelectedConsumable] = useState<Consumable | null>(null);
   const [loading, setLoading] = useState(true);
   const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
+  const [isEofyDialogOpen, setIsEofyDialogOpen] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -156,12 +158,21 @@ export default function ConsumablesPage() {
   return (
     <>
       <PageHeader title="Purchasing Register">
-        {hasAdminAccess && (
-          <Button onClick={handleAddConsumable}>
-            <PlusCircle className="mr-2" />
-            Add Purchase
+        <div className="flex space-x-2">
+          <Button 
+            variant="outline"
+            onClick={() => setIsEofyDialogOpen(true)}
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            EOFY Summary
           </Button>
-        )}
+          {hasAdminAccess && (
+            <Button onClick={handleAddConsumable}>
+              <PlusCircle className="mr-2" />
+              Add Purchase
+            </Button>
+          )}
+        </div>
       </PageHeader>
 
       <div className="space-y-6">
@@ -262,6 +273,7 @@ export default function ConsumablesPage() {
                           <TableHead>Supplier</TableHead>
                           <TableHead>Date</TableHead>
                           <TableHead className="text-right">Amount</TableHead>
+                          <TableHead>Receipt</TableHead>
                           {hasAdminAccess && <TableHead><span className="sr-only">Actions</span></TableHead>}
                         </TableRow>
                       </TableHeader>
@@ -283,6 +295,34 @@ export default function ConsumablesPage() {
                             <TableCell>{formatDate(consumable.datePurchased)}</TableCell>
                             <TableCell className="text-right font-medium">
                               {formatCurrency(consumable.purchaseAmount)}
+                            </TableCell>
+                            <TableCell>
+                              {consumable.receiptPhotoUrl ? (
+                                <div className="flex items-center space-x-2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => window.open(consumable.receiptPhotoUrl, '_blank')}
+                                  >
+                                    <Image className="w-4 h-4 mr-1" />
+                                    View
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      const link = document.createElement('a');
+                                      link.href = consumable.receiptPhotoUrl!;
+                                      link.download = consumable.receiptPhotoName || 'receipt.jpg';
+                                      link.click();
+                                    }}
+                                  >
+                                    <Download className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              ) : (
+                                <span className="text-sm text-muted-foreground">No receipt</span>
+                              )}
                             </TableCell>
                             {hasAdminAccess && (
                               <TableCell className="text-right">
@@ -325,6 +365,11 @@ export default function ConsumablesPage() {
         onOpenChange={setIsDialogOpen}
         consumable={selectedConsumable}
         onSave={handleSaveConsumable}
+      />
+      
+      <EofySummaryDialog
+        open={isEofyDialogOpen}
+        onOpenChange={setIsEofyDialogOpen}
       />
     </>
   );

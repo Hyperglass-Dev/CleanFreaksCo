@@ -19,6 +19,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Camera, Upload, Image, X } from 'lucide-react';
+import { storage } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import type { Consumable, PurchaseType } from '@/lib/types';
 
 type ConsumableDialogProps = {
@@ -31,10 +34,14 @@ type ConsumableDialogProps = {
 export function ConsumableDialog({ open, onOpenChange, consumable, onSave }: ConsumableDialogProps) {
   const [formData, setFormData] = useState<Partial<Consumable>>({});
   const [loading, setLoading] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   useEffect(() => {
     if (consumable) {
       setFormData(consumable);
+      setPhotoPreview(consumable.receiptPhotoUrl || null);
     } else {
       setFormData({ 
         name: '', 
@@ -43,7 +50,9 @@ export function ConsumableDialog({ open, onOpenChange, consumable, onSave }: Con
         purchaseAmount: 0,
         datePurchased: new Date().toISOString().split('T')[0]
       });
+      setPhotoPreview(null);
     }
+    setPhotoFile(null);
   }, [consumable, open]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,6 +67,64 @@ export function ConsumableDialog({ open, onOpenChange, consumable, onSave }: Con
     setFormData(prev => ({ ...prev, type: value }));
   };
 
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>, source: 'file' | 'camera') => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image must be less than 5MB');
+        return;
+      }
+      
+      setPhotoFile(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPhotoPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemovePhoto = () => {
+    setPhotoFile(null);
+    setPhotoPreview(null);
+    setFormData(prev => ({ 
+      ...prev, 
+      receiptPhotoUrl: undefined,
+      receiptPhotoName: undefined
+    }));
+  };
+
+  const uploadPhoto = async (): Promise<{ url: string; fileName: string } | null> => {
+    if (!photoFile) return null;
+    
+    setUploadingPhoto(true);
+    try {
+      const timestamp = Date.now();
+      const fileName = `receipts/${timestamp}_${photoFile.name}`;
+      const storageRef = ref(storage, fileName);
+      
+      await uploadBytes(storageRef, photoFile);
+      const url = await getDownloadURL(storageRef);
+      
+      return { url, fileName };
+    } catch (error) {
+      console.error('Error uploading photo:', error);
+      alert('Failed to upload photo. Please try again.');
+      return null;
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
   const handleSave = async () => {
     if (!formData.name || !formData.purchasedFrom || !formData.datePurchased || formData.purchaseAmount === undefined) {
       return;
@@ -65,7 +132,18 @@ export function ConsumableDialog({ open, onOpenChange, consumable, onSave }: Con
 
     setLoading(true);
     try {
-      onSave(formData as Consumable);
+      let finalFormData = { ...formData };
+      
+      // Upload photo if there's a new one
+      if (photoFile) {
+        const photoResult = await uploadPhoto();
+        if (photoResult) {
+          finalFormData.receiptPhotoUrl = photoResult.url;
+          finalFormData.receiptPhotoName = photoResult.fileName;
+        }
+      }
+      
+      onSave(finalFormData as Consumable);
       onOpenChange(false);
     } catch (error) {
       console.error('Error saving consumable:', error);
@@ -142,13 +220,75 @@ export function ConsumableDialog({ open, onOpenChange, consumable, onSave }: Con
               onChange={handleInputChange}
             />
           </div>
+
+          <div className="grid gap-2">
+            <Label>Receipt Photo (Optional)</Label>
+            {photoPreview ? (
+              <div className="relative">
+                <img 
+                  src={photoPreview} 
+                  alt="Receipt preview" 
+                  className="w-full h-32 object-cover rounded-lg border"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  className="absolute top-2 right-2"
+                  onClick={handleRemovePhoto}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    id="receipt-file"
+                    onChange={(e) => handlePhotoSelect(e, 'file')}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => document.getElementById('receipt-file')?.click()}
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Upload Photo
+                  </Button>
+                </div>
+                <div className="flex-1">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    className="hidden"
+                    id="receipt-camera"
+                    onChange={(e) => handlePhotoSelect(e, 'camera')}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => document.getElementById('receipt-camera')?.click()}
+                  >
+                    <Camera className="w-4 h-4 mr-2" />
+                    Take Photo
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={loading || !isValid}>
-            {loading ? 'Saving...' : 'Save Purchase'}
+          <Button onClick={handleSave} disabled={loading || !isValid || uploadingPhoto}>
+            {uploadingPhoto ? 'Uploading...' : loading ? 'Saving...' : 'Save Purchase'}
           </Button>
         </DialogFooter>
       </DialogContent>

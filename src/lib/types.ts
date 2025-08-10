@@ -143,6 +143,8 @@ export interface Consumable {
     datePurchased: string;
     createdAt: string;
     createdBy: string;
+    receiptPhotoUrl?: string;
+    receiptPhotoName?: string;
 }
 
 export interface JobRecord {

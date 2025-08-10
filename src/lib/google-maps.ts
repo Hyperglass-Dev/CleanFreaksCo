@@ -18,6 +18,7 @@ export const loadGoogleMapsAPI = (): Promise<void> => {
 
   // Return resolved promise if already loaded
   if (window.google?.maps) {
+    console.log('Google Maps already loaded');
     return Promise.resolve();
   }
 
@@ -28,8 +29,29 @@ export const loadGoogleMapsAPI = (): Promise<void> => {
     loadPromise = new Promise((resolve, reject) => {
       const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
       
+      console.log('Loading Google Maps API with key:', apiKey ? 'Present' : 'Missing');
+      
       if (!apiKey) {
+        isLoading = false;
+        loadPromise = null;
         reject(new Error('Google Maps API key not found. Set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY environment variable.'));
+        return;
+      }
+
+      // Check if script already exists
+      const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+      if (existingScript) {
+        console.log('Google Maps script already in DOM, waiting for load...');
+        // Wait a bit for it to load
+        const checkLoaded = () => {
+          if (window.google?.maps) {
+            isLoading = false;
+            resolve();
+          } else {
+            setTimeout(checkLoaded, 100);
+          }
+        };
+        checkLoaded();
         return;
       }
 
@@ -39,14 +61,16 @@ export const loadGoogleMapsAPI = (): Promise<void> => {
       script.defer = true;
       
       script.onload = () => {
+        console.log('Google Maps API loaded successfully');
         isLoading = false;
         resolve();
       };
       
-      script.onerror = () => {
+      script.onerror = (error) => {
+        console.error('Failed to load Google Maps script:', error);
         isLoading = false;
         loadPromise = null;
-        reject(new Error('Failed to load Google Maps API'));
+        reject(new Error('Failed to load Google Maps API script'));
       };
       
       document.head.appendChild(script);

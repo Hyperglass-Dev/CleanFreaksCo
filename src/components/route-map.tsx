@@ -50,43 +50,64 @@ export function RouteMap({ jobs, loading }: RouteMapProps) {
   }, [map, jobs]);
 
   const initializeMap = () => {
-    if (!mapRef.current) return;
+    if (!mapRef.current) {
+      console.error('Map ref not available');
+      setMapError('Map container not found');
+      setIsMapLoading(false);
+      return;
+    }
 
-    const mapInstance = new window.google.maps.Map(mapRef.current, {
-      zoom: 12,
-      center: { lat: -33.8688, lng: 151.2093 }, // Sydney default
-      mapTypeId: 'roadmap',
-      mapId: '45d96433875fef9af3c0d13a', // Clean Freaks Co map styling
-      styles: [
-        {
-          featureType: 'poi',
-          elementType: 'labels',
-          stylers: [{ visibility: 'off' }]
+    if (!window.google?.maps) {
+      console.error('Google Maps API not loaded');
+      setMapError('Google Maps API not loaded');
+      setIsMapLoading(false);
+      return;
+    }
+
+    try {
+      const mapInstance = new window.google.maps.Map(mapRef.current, {
+        zoom: 12,
+        center: { lat: -33.8688, lng: 151.2093 }, // Sydney default
+        mapTypeId: 'roadmap',
+        styles: [
+          {
+            featureType: 'poi',
+            elementType: 'labels',
+            stylers: [{ visibility: 'off' }]
+          }
+        ]
+      });
+
+      const directionsServiceInstance = new window.google.maps.DirectionsService();
+      const directionsRendererInstance = new window.google.maps.DirectionsRenderer({
+        draggable: true,
+        panel: null,
+        markerOptions: {
+          icon: {
+            path: window.google.maps.SymbolPath.CIRCLE,
+            scale: 8,
+            fillColor: '#800000',
+            fillOpacity: 1,
+            strokeColor: '#fff',
+            strokeWeight: 2
+          }
         }
-      ]
-    });
+      });
 
-    const directionsServiceInstance = new window.google.maps.DirectionsService();
-    const directionsRendererInstance = new window.google.maps.DirectionsRenderer({
-      draggable: true,
-      panel: null,
-      markerOptions: {
-        icon: {
-          path: window.google.maps.SymbolPath.CIRCLE,
-          scale: 8,
-          fillColor: '#800000',
-          fillOpacity: 1,
-          strokeColor: '#fff',
-          strokeWeight: 2
-        }
-      }
-    });
-
-    directionsRendererInstance.setMap(mapInstance);
-    
-    setMap(mapInstance);
-    setDirectionsService(directionsServiceInstance);
-    setDirectionsRenderer(directionsRendererInstance);
+      directionsRendererInstance.setMap(mapInstance);
+      
+      setMap(mapInstance);
+      setDirectionsService(directionsServiceInstance);
+      setDirectionsRenderer(directionsRendererInstance);
+      setIsMapLoading(false);
+      setMapError(null);
+      
+      console.log('Google Maps initialized successfully');
+    } catch (error) {
+      console.error('Error initializing map:', error);
+      setMapError(`Failed to initialize map: ${error}`);
+      setIsMapLoading(false);
+    }
   };
 
   const calculateRoute = async () => {
@@ -175,16 +196,51 @@ export function RouteMap({ jobs, loading }: RouteMapProps) {
     window.open(url, '_blank');
   };
 
-  if (loading) {
+  if (loading || isMapLoading) {
     return (
       <Card className="overflow-hidden shadow-lg">
         <CardHeader>
           <CardTitle>Route Map</CardTitle>
-          <CardDescription>Loading today's route...</CardDescription>
+          <CardDescription>Loading route map...</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="h-[400px] bg-gray-100 rounded-lg animate-pulse flex items-center justify-center">
             <div className="text-gray-400">Loading map...</div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (mapError) {
+    return (
+      <Card className="overflow-hidden shadow-lg">
+        <CardHeader>
+          <CardTitle>Route Map</CardTitle>
+          <CardDescription>Map Error</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[400px] bg-red-50 rounded-lg flex items-center justify-center">
+            <div className="text-center text-red-600">
+              <p className="font-medium">Failed to load map</p>
+              <p className="text-sm mt-1">{mapError}</p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="mt-3"
+                onClick={() => {
+                  setMapError(null);
+                  setIsMapLoading(true);
+                  loadGoogleMapsAPI().then(initializeMap).catch(error => {
+                    console.error('Retry failed:', error);
+                    setMapError(`Retry failed: ${error.message}`);
+                    setIsMapLoading(false);
+                  });
+                }}
+              >
+                Retry
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -236,6 +292,17 @@ export function RouteMap({ jobs, loading }: RouteMapProps) {
           ref={mapRef} 
           className="h-[400px] w-full rounded-lg border"
         />
+        
+        {/* Debug info in development */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="p-3 bg-blue-50 rounded-lg text-xs">
+            <p><strong>Debug Info:</strong></p>
+            <p>API Key: {process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ? 'Set' : 'Missing'}</p>
+            <p>Google Maps Loaded: {window.google?.maps ? 'Yes' : 'No'}</p>
+            <p>Map Instance: {map ? 'Created' : 'Not created'}</p>
+            <p>Jobs Count: {jobs.length}</p>
+          </div>
+        )}
         
         {routeInfo && (
           <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">

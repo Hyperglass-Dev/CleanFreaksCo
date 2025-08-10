@@ -22,7 +22,7 @@ export default function RunSheetPage() {
   const [staff, setStaff] = useState<Staff[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [viewType, setViewType] = useState<ViewType>('weekly');
+  const [viewType, setViewType] = useState<ViewType>('daily');
   const { user } = useAuth();
 
   const isAdmin = user?.role === 'admin';
@@ -47,6 +47,7 @@ export default function RunSheetPage() {
   };
 
   const getFilteredJobs = () => {
+    console.log('All jobs loaded:', jobs.map(j => ({ name: j.clientName, status: j.status, date: j.date })));
     const scheduledJobs = jobs.filter(job => job.status !== 'Unscheduled' && job.status !== 'Completed');
     
     switch (viewType) {
@@ -139,6 +140,14 @@ export default function RunSheetPage() {
   const todaysJobsForMap = filteredJobs.filter(job => {
     if (!job.date) return false;
     return isSameDay(new Date(job.date), new Date());
+  });
+  
+  console.log('Jobs for map debug:', { 
+    viewType, 
+    filteredJobsCount: filteredJobs.length, 
+    todaysJobsCount: todaysJobsForMap.length,
+    today: new Date().toDateString(),
+    jobDates: filteredJobs.map(j => ({ name: j.clientName, date: j.date }))
   });
 
   // Get staff address for daily planning (prioritize current user if they're staff, otherwise use first staff with address)

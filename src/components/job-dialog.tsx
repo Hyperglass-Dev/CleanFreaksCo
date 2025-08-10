@@ -97,7 +97,7 @@ export function JobDialog({ children, onJobCreated }: JobDialogProps) {
         time: formData.time,
         date: formData.date,
         description: formData.description,
-        status: formData.status,
+        status: (formData.date && formData.time) ? 'Scheduled' : 'Unscheduled',
         cleanerIds: assignmentMethod === 'manual' ? selectedStaff : undefined,
         estimatedValue: formData.estimatedValue || undefined,
         quotedPrice: formData.quotedPrice || undefined,

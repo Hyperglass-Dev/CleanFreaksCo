@@ -21,23 +21,27 @@ declare global {
 }
 
 export function RouteMap({ jobs, loading, staffAddress }: RouteMapProps) {
+  console.log('RouteMap props:', { jobsCount: jobs.length, loading, staffAddress });
   const [map, setMap] = useState<any>(null);
   const [directionsService, setDirectionsService] = useState<any>(null);
   const [directionsRenderer, setDirectionsRenderer] = useState<any>(null);
   const [routeInfo, setRouteInfo] = useState<{distance: string, duration: string} | null>(null);
   const [mapError, setMapError] = useState<string | null>(null);
-  const [isMapLoading, setIsMapLoading] = useState(true);
+  const [isMapLoading, setIsMapLoading] = useState(false);
   const [mapContainer, setMapContainer] = useState<HTMLDivElement | null>(null);
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
 
   // Initialize map when container is available
   useEffect(() => {
+    console.log('RouteMap useEffect triggered', { mapContainer: !!mapContainer, map: !!map, jobs: jobs.length });
     if (mapContainer && !map) {
+      console.log('Starting map initialization...');
       setIsMapLoading(true);
       setMapError(null);
       
       loadGoogleMapsAPI()
         .then(() => {
+          console.log('Google Maps API loaded, initializing map...');
           initializeMapWithContainer(mapContainer);
         })
         .catch((error) => {
@@ -47,6 +51,8 @@ export function RouteMap({ jobs, loading, staffAddress }: RouteMapProps) {
         });
     }
   }, [mapContainer, map]);
+
+
 
   useEffect(() => {
     if (map && jobs.length > 0) {
@@ -295,6 +301,8 @@ export function RouteMap({ jobs, loading, staffAddress }: RouteMapProps) {
     window.open(url, '_blank');
   };
 
+  console.log('RouteMap render state:', { loading, isMapLoading, mapError, jobsLength: jobs.length });
+  
   if (loading || isMapLoading) {
     return (
       <Card className="overflow-hidden shadow-lg">

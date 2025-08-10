@@ -61,9 +61,19 @@ export const loadGoogleMapsAPI = (): Promise<void> => {
       script.defer = true;
       
       script.onload = () => {
-        console.log('Google Maps API loaded successfully');
-        isLoading = false;
-        resolve();
+        console.log('Google Maps script loaded, waiting for API to initialize...');
+        // Wait for Google Maps API to be fully available
+        const checkMapReady = () => {
+          if (window.google?.maps?.Map) {
+            console.log('Google Maps API fully loaded and ready');
+            isLoading = false;
+            resolve();
+          } else {
+            console.log('Waiting for Google Maps API...');
+            setTimeout(checkMapReady, 100);
+          }
+        };
+        checkMapReady();
       };
       
       script.onerror = (error) => {

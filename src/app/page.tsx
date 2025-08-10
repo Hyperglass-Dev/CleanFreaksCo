@@ -7,7 +7,7 @@ import { PageHeader } from '@/components/page-header';
 import { KpiCard } from '@/components/kpi-card';
 import { calculateKpis } from '@/lib/data';
 import { RevenueChart } from '@/components/revenue-chart';
-import { BookingsChart } from '@/components/bookings-chart';
+import { StaffProductivityChart } from '@/components/bookings-chart';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { AstraDashboardWidget } from '@/components/astra-dashboard-widget';
 import { NotificationsCard } from '@/components/notifications-card';
@@ -90,7 +90,7 @@ export default function DashboardPage() {
       {/* Charts Section */}
       <div className="grid gap-6 md:grid-cols-2">
         <RevenueChart />
-        <BookingsChart />
+        <StaffProductivityChart />
       </div>
 
       {/* For non-main admins, show simplified version */}

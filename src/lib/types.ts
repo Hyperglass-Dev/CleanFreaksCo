@@ -130,11 +130,7 @@ export interface RevenueData {
     revenue: number;
 }
 
-export interface BookingData {
-    service: string;
-    bookings: number;
-    fill: string;
-}
+
 
 export type PurchaseType = 'Consumable' | 'Plant & Equipment' | 'Office Equipment';
 

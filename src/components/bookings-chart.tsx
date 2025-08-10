@@ -1,22 +1,27 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { getBookingsData } from '@/lib/data';
-import { BookingsChartClient } from './bookings-chart-client';
+import { getStaffProductivityData } from '@/lib/data';
+import { StaffProductivityChartClient } from './staff-productivity-chart-client';
 import { useEffect, useState } from 'react';
-import { BookingData } from '@/lib/types';
 
-export function BookingsChart() {
-  const [bookingsData, setBookingsData] = useState<BookingData[]>([]);
+interface StaffProductivityData {
+  staff: string;
+  completed: number;
+  fill: string;
+}
+
+export function StaffProductivityChart() {
+  const [productivityData, setProductivityData] = useState<StaffProductivityData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const data = await getBookingsData();
-        setBookingsData(data);
+        const data = await getStaffProductivityData();
+        setProductivityData(data);
       } catch (error) {
-        console.error('Error loading bookings data:', error);
+        console.error('Error loading staff productivity data:', error);
       } finally {
         setLoading(false);
       }
@@ -28,14 +33,14 @@ export function BookingsChart() {
   return (
     <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
       <CardHeader>
-        <CardTitle>Bookings by Service</CardTitle>
-        <CardDescription>Breakdown of all bookings by service type.</CardDescription>
+        <CardTitle>Staff Productivity</CardTitle>
+        <CardDescription>Jobs completed by each staff member this month.</CardDescription>
       </CardHeader>
       <CardContent>
         {loading ? (
           <div className="h-64 bg-gray-100 animate-pulse rounded" />
         ) : (
-          <BookingsChartClient data={bookingsData} />
+          <StaffProductivityChartClient data={productivityData} />
         )}
       </CardContent>
     </Card>

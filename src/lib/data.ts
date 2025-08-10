@@ -642,45 +642,64 @@ export const getRevenueData = async () => {
   }
 };
 
-export const getBookingsData = async () => {
+export const getStaffProductivityData = async () => {
   try {
-    const querySnapshot = await getDocs(collection(db, COLLECTIONS.jobs));
+    const [jobRecordsSnapshot, staffSnapshot] = await Promise.all([
+      getDocs(collection(db, COLLECTIONS.jobRecords)),
+      getDocs(collection(db, COLLECTIONS.staff))
+    ]);
     
-    // Group jobs by service type (extracted from description)
-    const serviceTypes: { [key: string]: number } = {
-      'Standard': 0,
-      'Deep Clean': 0,
-      'Windows': 0,
-      'Carpet': 0,
-      'Other': 0
-    };
-
-    querySnapshot.docs.forEach(doc => {
-      const data = doc.data();
-      const description = data.description?.toLowerCase() || '';
-      
-      if (description.includes('deep')) {
-        serviceTypes['Deep Clean']++;
-      } else if (description.includes('window')) {
-        serviceTypes['Windows']++;
-      } else if (description.includes('carpet')) {
-        serviceTypes['Carpet']++;
-      } else if (description.includes('standard')) {
-        serviceTypes['Standard']++;
-      } else {
-        serviceTypes['Other']++;
+    // Get current month's date range
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    
+    // Create staff lookup map
+    const staffMap = new Map();
+    staffSnapshot.docs.forEach(doc => {
+      const staff = doc.data();
+      if (!staff.archived) {
+        staffMap.set(doc.id, staff.name);
       }
     });
-
-    return [
-      { service: 'Standard', bookings: serviceTypes['Standard'], fill: 'hsl(var(--chart-1))' },
-      { service: 'Deep Clean', bookings: serviceTypes['Deep Clean'], fill: 'hsl(var(--chart-2))' },
-      { service: 'Windows', bookings: serviceTypes['Windows'], fill: 'hsl(var(--chart-3))' },
-      { service: 'Carpet', bookings: serviceTypes['Carpet'], fill: 'hsl(var(--chart-4))' },
-      { service: 'Other', bookings: serviceTypes['Other'], fill: 'hsl(var(--chart-5))' },
+    
+    // Count completed jobs per staff member this month
+    const staffJobCounts: { [key: string]: number } = {};
+    
+    jobRecordsSnapshot.docs.forEach(doc => {
+      const record = doc.data();
+      const completedDate = new Date(record.completedAt);
+      
+      // Check if job was completed this month
+      if (completedDate >= startOfMonth && completedDate <= endOfMonth) {
+        if (record.staffAssigned && Array.isArray(record.staffAssigned)) {
+          record.staffAssigned.forEach((staffId: string) => {
+            const staffName = staffMap.get(staffId) || 'Unknown Staff';
+            staffJobCounts[staffName] = (staffJobCounts[staffName] || 0) + 1;
+          });
+        }
+      }
+    });
+    
+    // Convert to chart format
+    const chartColors = [
+      'hsl(var(--chart-1))',
+      'hsl(var(--chart-2))',
+      'hsl(var(--chart-3))',
+      'hsl(var(--chart-4))',
+      'hsl(var(--chart-5))'
     ];
+    
+    return Object.entries(staffJobCounts)
+      .map(([staff, completed], index) => ({
+        staff: staff.split(' ')[0], // Use first name only for chart
+        completed,
+        fill: chartColors[index % chartColors.length]
+      }))
+      .sort((a, b) => b.completed - a.completed); // Sort by completion count
+      
   } catch (error) {
-    console.error('Error fetching bookings data:', error);
+    console.error('Error fetching staff productivity data:', error);
     return [];
   }
 };

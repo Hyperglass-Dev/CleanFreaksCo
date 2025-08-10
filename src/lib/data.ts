@@ -1,4 +1,4 @@
-import type { Cleaner, Staff, Job, Client, Kpi, NavLink, Invoice, Bill, Quote, CompanySettings } from '@/lib/types';
+import type { Cleaner, Staff, Job, Client, Kpi, NavLink, Invoice, Bill, Quote, CompanySettings, Consumable, JobRecord, MonthlyGroup } from '@/lib/types';
 import { db } from '@/lib/firebase';
 import { getStaffAvatar, getClientAvatar } from '@/lib/avatar-utils';
 import {
@@ -28,6 +28,8 @@ import {
   Bot,
   User,
   Users2,
+  Package,
+  ClipboardCheck,
 } from 'lucide-react';
 
 export const navLinks: NavLink[] = [
@@ -37,6 +39,8 @@ export const navLinks: NavLink[] = [
   { href: '/run-sheet', label: 'Run Sheet', icon: ClipboardList },
   { href: '/clients', label: 'Clients', icon: Users },
   { href: '/staff', label: 'Staff', icon: Users2 },
+  { href: '/consumables', label: 'Purchasing Register', icon: Package },
+  { href: '/job-register', label: 'Job Register', icon: ClipboardCheck },
   { href: '/assistant', label: 'Assistant', icon: Bot },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
@@ -51,7 +55,9 @@ const COLLECTIONS = {
   bills: 'bills',
   quotes: 'quotes',
   settings: 'settings',
-  kpis: 'kpis'
+  kpis: 'kpis',
+  consumables: 'consumables',
+  jobRecords: 'jobRecords'
 } as const;
 
 // Helper function to convert Firestore Timestamp to date string
@@ -118,12 +124,15 @@ export const getStaff = async (includeArchived = false): Promise<Staff[]> => {
   try {
     const querySnapshot = await getDocs(collection(db, COLLECTIONS.staff));
     return querySnapshot.docs
-      .map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        avatar: doc.data().avatar || getStaffAvatar(doc.data().name || 'User')
-      }))
-      .filter(staff => includeArchived || !staff.archived) as Staff[];
+      .map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          avatar: data.avatar || getStaffAvatar(data.name || 'User')
+        } as Staff;
+      })
+      .filter(staff => includeArchived || !staff.archived);
   } catch (error) {
     console.error('Error fetching staff:', error);
     return [];
@@ -695,4 +704,215 @@ export const companySettings: CompanySettings = {
   website: '',
   logo: '',
   bankDetails: '',
+};
+
+// =============================================================================
+// CONSUMABLES REGISTER FUNCTIONS
+// =============================================================================
+
+export const getConsumables = async (): Promise<Consumable[]> => {
+  try {
+    const querySnapshot = await getDocs(
+      query(collection(db, COLLECTIONS.consumables), orderBy('datePurchased', 'desc'))
+    );
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })) as Consumable[];
+  } catch (error) {
+    console.error('Error fetching consumables:', error);
+    return [];
+  }
+};
+
+export const getConsumablesGroupedByMonth = async (): Promise<MonthlyGroup<Consumable>[]> => {
+  try {
+    const consumables = await getConsumables();
+    const grouped = new Map<string, MonthlyGroup<Consumable>>();
+
+    consumables.forEach(consumable => {
+      const date = new Date(consumable.datePurchased);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      const monthName = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+      if (!grouped.has(monthKey)) {
+        grouped.set(monthKey, {
+          month: monthName,
+          year: date.getFullYear(),
+          items: [],
+          totalAmount: 0,
+          itemCount: 0
+        });
+      }
+
+      const group = grouped.get(monthKey)!;
+      group.items.push(consumable);
+      group.totalAmount = (group.totalAmount || 0) + consumable.purchaseAmount;
+      group.itemCount++;
+    });
+
+    return Array.from(grouped.values()).sort((a, b) => {
+      return b.year - a.year || b.month.localeCompare(a.month);
+    });
+  } catch (error) {
+    console.error('Error grouping consumables by month:', error);
+    return [];
+  }
+};
+
+export const addConsumable = async (consumable: Omit<Consumable, 'id'>): Promise<string> => {
+  try {
+    const docRef = await addDoc(collection(db, COLLECTIONS.consumables), {
+      ...consumable,
+      createdAt: new Date().toISOString()
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error('Error adding consumable:', error);
+    throw error;
+  }
+};
+
+export const updateConsumable = async (id: string, updates: Partial<Consumable>): Promise<void> => {
+  try {
+    await updateDoc(doc(db, COLLECTIONS.consumables, id), updates);
+  } catch (error) {
+    console.error('Error updating consumable:', error);
+    throw error;
+  }
+};
+
+export const deleteConsumable = async (id: string): Promise<void> => {
+  try {
+    await deleteDoc(doc(db, COLLECTIONS.consumables, id));
+  } catch (error) {
+    console.error('Error deleting consumable:', error);
+    throw error;
+  }
+};
+
+// =============================================================================
+// JOB REGISTER FUNCTIONS
+// =============================================================================
+
+export const getJobRecords = async (): Promise<JobRecord[]> => {
+  try {
+    const querySnapshot = await getDocs(
+      query(collection(db, COLLECTIONS.jobRecords), orderBy('serviceDate', 'desc'))
+    );
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })) as JobRecord[];
+  } catch (error) {
+    console.error('Error fetching job records:', error);
+    return [];
+  }
+};
+
+export const getJobRecordsGroupedByMonth = async (): Promise<MonthlyGroup<JobRecord>[]> => {
+  try {
+    const jobRecords = await getJobRecords();
+    const grouped = new Map<string, MonthlyGroup<JobRecord>>();
+
+    jobRecords.forEach(record => {
+      const date = new Date(record.serviceDate);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      const monthName = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+      if (!grouped.has(monthKey)) {
+        grouped.set(monthKey, {
+          month: monthName,
+          year: date.getFullYear(),
+          items: [],
+          totalAmount: 0,
+          itemCount: 0
+        });
+      }
+
+      const group = grouped.get(monthKey)!;
+      group.items.push(record);
+      group.totalAmount = (group.totalAmount || 0) + record.priceCharged;
+      group.itemCount++;
+    });
+
+    return Array.from(grouped.values()).sort((a, b) => {
+      return b.year - a.year || b.month.localeCompare(a.month);
+    });
+  } catch (error) {
+    console.error('Error grouping job records by month:', error);
+    return [];
+  }
+};
+
+export const addJobRecord = async (jobRecord: Omit<JobRecord, 'id'>): Promise<string> => {
+  try {
+    const docRef = await addDoc(collection(db, COLLECTIONS.jobRecords), {
+      ...jobRecord,
+      completedAt: new Date().toISOString()
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error('Error adding job record:', error);
+    throw error;
+  }
+};
+
+export const updateJobRecord = async (id: string, updates: Partial<JobRecord>): Promise<void> => {
+  try {
+    await updateDoc(doc(db, COLLECTIONS.jobRecords, id), updates);
+  } catch (error) {
+    console.error('Error updating job record:', error);
+    throw error;
+  }
+};
+
+export const deleteJobRecord = async (id: string): Promise<void> => {
+  try {
+    await deleteDoc(doc(db, COLLECTIONS.jobRecords, id));
+  } catch (error) {
+    console.error('Error deleting job record:', error);
+    throw error;
+  }
+};
+
+// Function to complete a job and add it to job records
+export const completeJob = async (jobId: string, priceCharged: number, notes?: string): Promise<void> => {
+  try {
+    // Get the job details
+    const jobDoc = await getDoc(doc(db, COLLECTIONS.jobs, jobId));
+    if (!jobDoc.exists()) {
+      throw new Error('Job not found');
+    }
+
+    const job = { id: jobDoc.id, ...jobDoc.data() } as Job;
+
+    // Create job record
+    const jobRecord: Omit<JobRecord, 'id'> = {
+      jobId: job.id,
+      clientName: job.clientName,
+      clientId: '', // Will need to be populated from job data
+      address: job.address,
+      serviceDate: job.date,
+      serviceTime: job.time,
+      description: job.description,
+      staffAssigned: job.cleanerIds || [],
+      priceCharged,
+      completedAt: new Date().toISOString(),
+      completedBy: '', // Should be populated with current user
+      notes
+    };
+
+    // Add to job records
+    await addJobRecord(jobRecord);
+
+    // Update job status to completed
+    await updateDoc(doc(db, COLLECTIONS.jobs, jobId), {
+      status: 'Completed'
+    });
+
+  } catch (error) {
+    console.error('Error completing job:', error);
+    throw error;
+  }
 };

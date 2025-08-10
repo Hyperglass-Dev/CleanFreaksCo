@@ -4,16 +4,19 @@ import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Sparkles, Clock, MapPin } from 'lucide-react';
+import { Sparkles, Clock, MapPin, Users } from 'lucide-react';
 import { getJobs } from '@/lib/data';
 import { SmartAllocationDialog } from '@/components/smart-allocation-dialog';
+import { ManualAssignmentDialog } from '@/components/manual-assignment-dialog';
 import { SchedulingCalendar } from '@/components/scheduling-calendar';
 import { JobDialog } from '@/components/job-dialog';
 import type { Job } from '@/lib/types';
 
 export default function SchedulingPage() {
   const [selectedJobDescription, setSelectedJobDescription] = useState('');
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSmartDialogOpen, setIsSmartDialogOpen] = useState(false);
+  const [isManualDialogOpen, setIsManualDialogOpen] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -36,7 +39,12 @@ export default function SchedulingPage() {
 
   const handleSmartAllocateClick = (description: string) => {
     setSelectedJobDescription(description);
-    setIsDialogOpen(true);
+    setIsSmartDialogOpen(true);
+  };
+
+  const handleManualAssignClick = (job: Job) => {
+    setSelectedJob(job);
+    setIsManualDialogOpen(true);
   };
 
   return (
@@ -70,14 +78,23 @@ export default function SchedulingPage() {
                       <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1.5"><MapPin className="w-3 h-3" /> {job.address}</span>
                       </div>
-                      <Button 
-                        size="sm" 
-                        className="w-full mt-3"
-                        onClick={() => handleSmartAllocateClick(job.description)}
-                      >
-                        <Sparkles className="w-4 h-4 mr-2" />
-                        Smart Allocate
-                      </Button>
+                      <div className="grid grid-cols-2 gap-2 mt-3">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleManualAssignClick(job)}
+                        >
+                          <Users className="w-4 h-4 mr-2" />
+                          Manual
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          onClick={() => handleSmartAllocateClick(job.description)}
+                        >
+                          <Sparkles className="w-4 h-4 mr-2" />
+                          Smart AI
+                        </Button>
+                      </div>
                     </div>
                   ))
                 ) : (
@@ -92,9 +109,15 @@ export default function SchedulingPage() {
         </div>
       </div>
       <SmartAllocationDialog
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
+        open={isSmartDialogOpen}
+        onOpenChange={setIsSmartDialogOpen}
         jobDescription={selectedJobDescription}
+      />
+      <ManualAssignmentDialog
+        open={isManualDialogOpen}
+        onOpenChange={setIsManualDialogOpen}
+        job={selectedJob}
+        onJobUpdated={loadJobs}
       />
     </>
   );

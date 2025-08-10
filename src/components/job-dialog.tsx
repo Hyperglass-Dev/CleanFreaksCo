@@ -7,9 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { addJob, getClients } from '@/lib/data';
-import { Plus } from 'lucide-react';
-import type { Client } from '@/lib/types';
+import { addJob, getClients, getStaff } from '@/lib/data';
+import { Plus, DollarSign, Users, Sparkles, UserPlus } from 'lucide-react';
+import type { Client, Staff } from '@/lib/types';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Separator } from '@/components/ui/separator';
 import { AddressAutocomplete } from '@/components/address-autocomplete';
 
 interface JobDialogProps {
@@ -20,7 +22,10 @@ interface JobDialogProps {
 export function JobDialog({ children, onJobCreated }: JobDialogProps) {
   const [open, setOpen] = useState(false);
   const [clients, setClients] = useState<Client[]>([]);
+  const [staff, setStaff] = useState<Staff[]>([]);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [selectedStaff, setSelectedStaff] = useState<string[]>([]);
+  const [assignmentMethod, setAssignmentMethod] = useState<'manual' | 'smart'>('manual');
   const [formData, setFormData] = useState({
     clientId: '',
     clientName: '',
@@ -29,12 +34,15 @@ export function JobDialog({ children, onJobCreated }: JobDialogProps) {
     date: '',
     description: '',
     status: 'Unscheduled' as const,
+    estimatedValue: 0,
+    quotedPrice: 0,
   });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (open) {
       loadClients();
+      loadStaff();
     }
   }, [open]);
 
@@ -44,6 +52,15 @@ export function JobDialog({ children, onJobCreated }: JobDialogProps) {
       setClients(clientsData);
     } catch (error) {
       console.error('Failed to load clients:', error);
+    }
+  };
+
+  const loadStaff = async () => {
+    try {
+      const staffData = await getStaff();
+      setStaff(staffData);
+    } catch (error) {
+      console.error('Failed to load staff:', error);
     }
   };
 
@@ -60,6 +77,14 @@ export function JobDialog({ children, onJobCreated }: JobDialogProps) {
     }
   };
 
+  const handleStaffToggle = (staffId: string) => {
+    setSelectedStaff(prev => 
+      prev.includes(staffId) 
+        ? prev.filter(id => id !== staffId)
+        : [...prev, staffId]
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -72,6 +97,9 @@ export function JobDialog({ children, onJobCreated }: JobDialogProps) {
         date: formData.date,
         description: formData.description,
         status: formData.status,
+        cleanerIds: assignmentMethod === 'manual' ? selectedStaff : undefined,
+        estimatedValue: formData.estimatedValue || undefined,
+        quotedPrice: formData.quotedPrice || undefined,
       };
       await addJob(jobData);
       
@@ -83,8 +111,12 @@ export function JobDialog({ children, onJobCreated }: JobDialogProps) {
         date: '',
         description: '',
         status: 'Unscheduled',
+        estimatedValue: 0,
+        quotedPrice: 0,
       });
       setSelectedClient(null);
+      setSelectedStaff([]);
+      setAssignmentMethod('manual');
       setOpen(false);
       
       // Refresh the jobs list
@@ -108,11 +140,11 @@ export function JobDialog({ children, onJobCreated }: JobDialogProps) {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New Job</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <Label htmlFor="client">Select Client</Label>
             <Select value={formData.clientId} onValueChange={handleClientSelect} required>
@@ -180,6 +212,125 @@ export function JobDialog({ children, onJobCreated }: JobDialogProps) {
               placeholder="Describe the cleaning job..."
               required
             />
+          </div>
+
+          {/* Pricing Section */}
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <Label className="text-base font-medium">Job Pricing</Label>
+            </div>
+            <div className="grid grid-cols-2 gap-4 pl-6">
+              <div>
+                <Label htmlFor="quotedPrice">Quoted Price (AUD)</Label>
+                <Input
+                  id="quotedPrice"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.quotedPrice || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, quotedPrice: parseFloat(e.target.value) || 0 }))}
+                  placeholder="0.00"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Price agreed with client
+                </p>
+              </div>
+              <div>
+                <Label htmlFor="estimatedValue">Estimated Value (AUD)</Label>
+                <Input
+                  id="estimatedValue"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.estimatedValue || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, estimatedValue: parseFloat(e.target.value) || 0 }))}
+                  placeholder="0.00"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Internal cost estimate
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Staff Assignment Section */}
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              <Label className="text-base font-medium">Staff Assignment</Label>
+            </div>
+            
+            <div className="flex gap-2 pl-6">
+              <Button
+                type="button"
+                variant={assignmentMethod === 'manual' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setAssignmentMethod('manual')}
+              >
+                <UserPlus className="w-4 h-4 mr-2" />
+                Manual Assignment
+              </Button>
+              <Button
+                type="button"
+                variant={assignmentMethod === 'smart' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setAssignmentMethod('smart')}
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Smart Allocation
+              </Button>
+            </div>
+
+            {assignmentMethod === 'manual' && (
+              <div className="pl-6 space-y-3">
+                <Label className="text-sm font-medium">Select Staff Members</Label>
+                <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto border rounded-md p-3 bg-muted/50">
+                  {staff.length === 0 ? (
+                    <p className="text-sm text-muted-foreground col-span-2">
+                      No staff members available. <a href="/staff" className="text-primary hover:underline">Add staff first</a>
+                    </p>
+                  ) : (
+                    staff.map((member) => (
+                      <div key={member.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`staff-${member.id}`}
+                          checked={selectedStaff.includes(member.id!)}
+                          onCheckedChange={() => handleStaffToggle(member.id!)}
+                        />
+                        <Label 
+                          htmlFor={`staff-${member.id}`}
+                          className="text-sm font-normal cursor-pointer"
+                        >
+                          {member.name}
+                        </Label>
+                      </div>
+                    ))
+                  )}
+                </div>
+                {selectedStaff.length > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    {selectedStaff.length} staff member{selectedStaff.length > 1 ? 's' : ''} selected
+                  </p>
+                )}
+              </div>
+            )}
+
+            {assignmentMethod === 'smart' && (
+              <div className="pl-6">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <div className="flex items-center space-x-2 text-blue-800">
+                    <Sparkles className="h-4 w-4" />
+                    <span className="text-sm font-medium">Smart Allocation Enabled</span>
+                  </div>
+                  <p className="text-xs text-blue-600 mt-1">
+                    Staff will be automatically assigned based on skills, location, and availability using AI.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
           
           <div>

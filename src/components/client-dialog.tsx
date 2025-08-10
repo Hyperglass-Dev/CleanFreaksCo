@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Upload } from 'lucide-react';
 import type { Client } from '@/lib/types';
+import { getClientAvatar } from '@/lib/avatar-utils';
 import { Textarea } from './ui/textarea';
 
 type ClientDialogProps = {
@@ -34,14 +35,24 @@ export function ClientDialog({ open, onOpenChange, client, onSave }: ClientDialo
       setFormData(client);
       setLogoPreview(client.avatar);
     } else {
-      setFormData({ name: '', email: '', phone: '', address: '', avatar: 'https://placehold.co/150x150.png' });
-      setLogoPreview('https://placehold.co/150x150.png');
+      setFormData({ name: '', email: '', phone: '', address: '', avatar: getClientAvatar('Client') });
+      setLogoPreview(getClientAvatar('Client'));
     }
   }, [client, open]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
-    setFormData(prev => ({ ...prev, [id]: value }));
+    setFormData(prev => {
+      const updated = { ...prev, [id]: value };
+      
+      // Update avatar when name changes (only if using default avatar)
+      if (id === 'name' && value && (!prev.avatar || prev.avatar.startsWith('data:image/svg+xml'))) {
+        updated.avatar = getClientAvatar(value);
+        setLogoPreview(getClientAvatar(value));
+      }
+      
+      return updated;
+    });
   };
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {

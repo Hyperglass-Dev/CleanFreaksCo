@@ -10,6 +10,7 @@ import { Bot, User, Send, Loader2, Sparkles } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getAssistantResponse } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
+import { getStaffAvatar } from '@/lib/avatar-utils';
 
 interface Message {
     sender: 'user' | 'assistant';
@@ -110,7 +111,7 @@ export default function AssistantPage() {
                             </div>
                             {msg.sender === 'user' && (
                                 <Avatar>
-                                     <AvatarImage src="https://ui-avatars.io/api/?name=Dijana&background=E6E6FA&color=800000" alt="Dijana" />
+                                     <AvatarImage src={getStaffAvatar("Dijana")} alt="Dijana" />
                                      <AvatarFallback>D</AvatarFallback>
                                 </Avatar>
                             )}

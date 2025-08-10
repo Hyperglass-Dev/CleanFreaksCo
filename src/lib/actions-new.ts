@@ -32,23 +32,15 @@ export async function getAssistantResponseNew(userMessage: string): Promise<stri
     console.log('Testing parameter orders...');
     
     let runStatus;
-    try {
-      // Test normal order first
-      console.log('Trying normal order (threadId, runId)...');
-      runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
-      console.log('SUCCESS: Normal order works!');
-    } catch (error) {
-      console.log('Normal order failed, trying reversed...');
-      // Test reversed order
-      runStatus = await openai.beta.threads.runs.retrieve(run.id, thread.id);
-      console.log('SUCCESS: Reversed order works!');
-    }
+    // Get the run status
+    console.log('Retrieving run status...');
+    runStatus = await (openai.beta.threads.runs.retrieve as any)(run.id, thread.id);
     
     // Poll for completion
     while (runStatus.status === 'in_progress' || runStatus.status === 'queued') {
       console.log('Run status:', runStatus.status, '- waiting...');
       await new Promise(resolve => setTimeout(resolve, 1000));
-      runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+      runStatus = await (openai.beta.threads.runs.retrieve as any)(run.id, thread.id);
     }
     
     if (runStatus.status === 'completed') {

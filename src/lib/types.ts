@@ -32,6 +32,8 @@ export interface Job {
   description: string;
   status: 'Unscheduled' | 'Scheduled' | 'In Progress' | 'Completed';
   cleanerIds?: string[];
+  estimatedValue?: number;
+  quotedPrice?: number;
 }
 
 export interface Client {
@@ -130,4 +132,41 @@ export interface BookingData {
     service: string;
     bookings: number;
     fill: string;
+}
+
+export type PurchaseType = 'Consumable' | 'Plant & Equipment' | 'Office Equipment';
+
+export interface Consumable {
+    id?: string;
+    name: string;
+    type: PurchaseType;
+    purchasedFrom: string;
+    purchaseAmount: number;
+    datePurchased: string;
+    createdAt: string;
+    createdBy: string;
+}
+
+export interface JobRecord {
+    id?: string;
+    jobId: string;
+    clientName: string;
+    clientId: string;
+    address: string;
+    serviceDate: string;
+    serviceTime: string;
+    description: string;
+    staffAssigned: string[];
+    priceCharged: number;
+    completedAt: string;
+    completedBy: string;
+    notes?: string;
+}
+
+export interface MonthlyGroup<T> {
+    month: string;
+    year: number;
+    items: T[];
+    totalAmount?: number;
+    itemCount: number;
 }

@@ -15,6 +15,7 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { getCompanyAvatar } from '@/lib/avatar-utils';
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState<CompanySettings>({
@@ -99,7 +100,7 @@ export default function SettingsPage() {
               <div className="md:col-span-1 flex flex-col items-center text-center">
                 <div className="relative w-32 h-32 mb-4">
                   <Image
-                      src={logoPreview || "https://ui-avatars.io/api/?name=Company&background=E6E6FA&color=800000&size=150"}
+                      src={logoPreview || getCompanyAvatar(settings.name || 'Company')}
                       alt="Company Logo"
                       width={128}
                       height={128}

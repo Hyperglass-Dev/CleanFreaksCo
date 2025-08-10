@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
+import { getStaffAvatar } from '@/lib/avatar-utils';
 
 type StaffDialogProps = {
   open: boolean;
@@ -54,15 +55,25 @@ export function StaffDialog({ open, onOpenChange, staff, onSave }: StaffDialogPr
         skills: [], 
         location: '', 
         availability: '', 
-        avatar: 'https://ui-avatars.io/api/?name=User&background=E6E6FA&color=800000&size=150' 
+        avatar: getStaffAvatar('User')
       });
-      setAvatarPreview('https://ui-avatars.io/api/?name=User&background=E6E6FA&color=800000&size=150');
+      setAvatarPreview(getStaffAvatar('User'));
     }
   }, [staff, open]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
-    setFormData(prev => ({ ...prev, [id]: value }));
+    setFormData(prev => {
+      const updated = { ...prev, [id]: value };
+      
+      // Update avatar when name changes (only if using default avatar)
+      if (id === 'name' && value && (!prev.avatar || prev.avatar.startsWith('data:image/svg+xml'))) {
+        updated.avatar = getStaffAvatar(value);
+        setAvatarPreview(getStaffAvatar(value));
+      }
+      
+      return updated;
+    });
   };
   
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {

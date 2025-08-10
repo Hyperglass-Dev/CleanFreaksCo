@@ -54,7 +54,7 @@ export default function RunSheetPage() {
             </div>
           ) : todaysJobs.length > 0 ? (
             todaysJobs.map(job => (
-              <JobCard key={job.id} job={job} />
+              <JobCard key={job.id} job={job} onJobUpdated={loadJobs} />
             ))
           ) : (
             <Card>

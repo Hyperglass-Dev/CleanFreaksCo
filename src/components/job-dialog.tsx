@@ -36,6 +36,7 @@ export function JobDialog({ children, onJobCreated }: JobDialogProps) {
     status: 'Unscheduled' as const,
     estimatedValue: 0,
     quotedPrice: 0,
+    estimatedDuration: 120, // Default 2 hours
   });
   const [saving, setSaving] = useState(false);
 
@@ -100,6 +101,7 @@ export function JobDialog({ children, onJobCreated }: JobDialogProps) {
         cleanerIds: assignmentMethod === 'manual' ? selectedStaff : undefined,
         estimatedValue: formData.estimatedValue || undefined,
         quotedPrice: formData.quotedPrice || undefined,
+        estimatedDuration: formData.estimatedDuration,
       };
       await addJob(jobData);
       
@@ -113,6 +115,7 @@ export function JobDialog({ children, onJobCreated }: JobDialogProps) {
         status: 'Unscheduled',
         estimatedValue: 0,
         quotedPrice: 0,
+        estimatedDuration: 120,
       });
       setSelectedClient(null);
       setSelectedStaff([]);
@@ -212,6 +215,33 @@ export function JobDialog({ children, onJobCreated }: JobDialogProps) {
               placeholder="Describe the cleaning job..."
               required
             />
+          </div>
+
+          {/* Duration Estimation */}
+          <div>
+            <Label htmlFor="estimatedDuration">Estimated Duration</Label>
+            <Select 
+              value={formData.estimatedDuration.toString()} 
+              onValueChange={(value) => setFormData(prev => ({ ...prev, estimatedDuration: parseInt(value) }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select duration" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="30">30 minutes - Quick touch-up</SelectItem>
+                <SelectItem value="60">1 hour - Basic clean</SelectItem>
+                <SelectItem value="90">1.5 hours - Standard clean</SelectItem>
+                <SelectItem value="120">2 hours - Thorough clean</SelectItem>
+                <SelectItem value="180">3 hours - Deep clean</SelectItem>
+                <SelectItem value="240">4 hours - Full service</SelectItem>
+                <SelectItem value="300">5 hours - Extensive clean</SelectItem>
+                <SelectItem value="360">6 hours - Complete overhaul</SelectItem>
+                <SelectItem value="480">8 hours - Full day service</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground mt-1">
+              Duration helps with scheduling and allows for travel time between jobs
+            </p>
           </div>
 
           {/* Pricing Section */}

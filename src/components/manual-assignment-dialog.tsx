@@ -142,6 +142,12 @@ export function ManualAssignmentDialog({ open, onOpenChange, job, onJobUpdated }
             <div className="font-medium">{job.clientName}</div>
             <div className="text-sm text-muted-foreground">{job.description}</div>
             <div className="text-sm text-muted-foreground">{job.address}</div>
+            {job.estimatedDuration && (
+              <div className="text-sm text-muted-foreground">
+                <Clock className="h-3 w-3 inline mr-1" />
+                Estimated duration: {Math.floor(job.estimatedDuration / 60)}h {job.estimatedDuration % 60}min
+              </div>
+            )}
           </div>
 
           {/* Date Selection */}
@@ -190,6 +196,16 @@ export function ManualAssignmentDialog({ open, onOpenChange, job, onJobUpdated }
                 ))}
               </SelectContent>
             </Select>
+            {job.estimatedDuration && selectedTime && (
+              <p className="text-xs text-muted-foreground">
+                Job will run until approximately {(() => {
+                  const [hours, minutes] = selectedTime.split(':').map(Number);
+                  const endTime = new Date();
+                  endTime.setHours(hours, minutes + job.estimatedDuration);
+                  return endTime.toTimeString().substring(0, 5);
+                })()} (including travel time buffer)
+              </p>
+            )}
           </div>
 
           {/* Staff Selection */}

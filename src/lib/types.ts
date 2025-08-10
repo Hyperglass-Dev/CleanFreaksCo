@@ -36,6 +36,7 @@ export interface Job {
   cleanerIds?: string[];
   estimatedValue?: number;
   quotedPrice?: number;
+  estimatedDuration?: number; // Duration in minutes
 }
 
 export interface Client {

@@ -116,16 +116,14 @@ export const deleteCleaner = async (id: string): Promise<void> => {
 // STAFF FUNCTIONS
 export const getStaff = async (includeArchived = false): Promise<Staff[]> => {
   try {
-    let q = collection(db, COLLECTIONS.staff);
-    if (!includeArchived) {
-      q = query(q, where('archived', '!=', true));
-    }
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      avatar: doc.data().avatar || getStaffAvatar(doc.data().name || 'User')
-    })) as Staff[];
+    const querySnapshot = await getDocs(collection(db, COLLECTIONS.staff));
+    return querySnapshot.docs
+      .map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        avatar: doc.data().avatar || getStaffAvatar(doc.data().name || 'User')
+      }))
+      .filter(staff => includeArchived || !staff.archived) as Staff[];
   } catch (error) {
     console.error('Error fetching staff:', error);
     return [];

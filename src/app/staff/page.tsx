@@ -14,8 +14,8 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { getStaff, addStaff, updateStaff, initializeDijanaAsStaff } from '@/lib/data';
-import { MoreHorizontal, PlusCircle } from 'lucide-react';
+import { getStaff, addStaff, updateStaff, deleteStaff, archiveStaff, initializeDijanaAsStaff } from '@/lib/data';
+import { MoreHorizontal, PlusCircle, Trash2, Archive } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -80,6 +80,32 @@ export default function StaffPage() {
     } catch (error) {
       console.error('Error saving staff:', error);
       toast({ title: "Error", description: "Failed to save staff member.", variant: "destructive" });
+    }
+  };
+
+  const handleArchiveStaff = async (staffMember: Staff) => {
+    try {
+      if (staffMember.id) {
+        await archiveStaff(staffMember.id);
+        setStaff(staff.filter(s => s.id !== staffMember.id));
+        toast({ title: "Staff Archived", description: `${staffMember.name} has been archived.`});
+      }
+    } catch (error) {
+      console.error('Error archiving staff:', error);
+      toast({ title: "Error", description: "Failed to archive staff member.", variant: "destructive" });
+    }
+  };
+
+  const handleDeleteStaff = async (staffMember: Staff) => {
+    try {
+      if (staffMember.id && confirm(`Are you sure you want to permanently delete ${staffMember.name}? This action cannot be undone.`)) {
+        await deleteStaff(staffMember.id);
+        setStaff(staff.filter(s => s.id !== staffMember.id));
+        toast({ title: "Staff Deleted", description: `${staffMember.name} has been deleted.`});
+      }
+    } catch (error) {
+      console.error('Error deleting staff:', error);
+      toast({ title: "Error", description: "Failed to delete staff member.", variant: "destructive" });
     }
   };
   
@@ -150,13 +176,24 @@ export default function StaffPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEditStaff(member)}>
-                          Edit Staff
-                        </DropdownMenuItem>
-                         <DropdownMenuItem>
-                          View Schedule
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
+                      <DropdownMenuItem onClick={() => handleEditStaff(member)}>
+                      Edit Staff
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                      View Schedule
+                      </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleArchiveStaff(member)}>
+                           <Archive className="w-4 h-4 mr-2" />
+                           Archive
+                         </DropdownMenuItem>
+                         <DropdownMenuItem 
+                           onClick={() => handleDeleteStaff(member)}
+                           className="text-red-600 focus:text-red-600"
+                         >
+                           <Trash2 className="w-4 h-4 mr-2" />
+                           Delete
+                         </DropdownMenuItem>
+                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
                 </TableRow>
